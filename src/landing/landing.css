@@ -1,0 +1,55 @@
+.full-background {
+    height: 100vh;
+    width: 100vw;
+    background-image:linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('./background.jpg');
+    background-size: cover;
+    background-position: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  .search-container {
+    text-align: center;
+    width: 90%; /* Or any other percentage or fixed width you prefer */
+    max-width: 1200px; /* Optional: Ensures it doesn't get too wide on larger screens */
+    margin: auto; /* Centers the container */
+}
+  
+.search-header {
+    color: white; /* Ensures visibility against the background */
+    margin-bottom: 50px; /* Increase space between header and search bar */
+    margin-top: -50px; /* Move up the header */
+    font-size: 4rem; /* Increase font size */
+    text-shadow: 2px 2px 8px rgba(0,0,0,0.7); /* Enhance readability against varied backgrounds */
+  }
+
+  .search-subheader{
+    color: white; /* Ensures visibility against the background */
+    margin-bottom: 50px; /* Increase space between header and search bar */
+    margin-top: -50px; /* Move up the header */
+    font-size: 3rem; /* Increase font size */
+    text-shadow: 2px 2px 8px rgba(0,0,0,0.7); 
+  }
+  
+  
+  .search-input {
+    width: 60%; /* Make search bar bigger */
+    padding: 15px; /* More padding for larger touch area */
+    margin-bottom: 10px; /* Space between input and button */
+    font-size: 24px; /* Larger text inside search bar */
+    border: 2px solid #000; /* Black border */
+    border-radius: 25px 0 0 25px; /* Rounded edges */
+    background-color: #fff; /* White background */
+    color: #000; /* Black text */
+  }
+  
+  .search-button {
+    padding: 15px 25px; /* Larger padding for a bigger button */
+    font-size: 24px; /* Larger font size for the text */
+    border-radius: 0 25px 25px 0; /* Rounded edges to match the search bar */
+    cursor: pointer;
+    background-color: #000; /* Black background */
+    color: white; /* White text */
+  }
+  
