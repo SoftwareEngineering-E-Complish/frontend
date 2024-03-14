@@ -1,6 +1,7 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Link } from "react-router-dom";
 import { useState } from "react";
+import axios from "axios";
 
 function Header() {
 
@@ -15,6 +16,33 @@ function Header() {
       setOpenedDrawer(false)
     }
   }
+
+
+  const handleRegister = async (event) => {
+    event.preventDefault();
+    try {
+      const response = await axios.get("http://localhost:8005/signupURL",);
+      console.log("Signup URL: " + response.data);
+  
+      //setSearchResults(searchResults); // Set search results in global state
+      window.location.replace(response.data);
+      } catch(error){
+
+      }
+  };
+
+  const handleLogin = async (event) => {
+    event.preventDefault();
+    try {
+      const response = await axios.get("http://localhost:8005/loginURL",);
+      console.log("Login URL: " + response.data);
+  
+      //setSearchResults(searchResults); // Set search results in global state
+      window.location.replace(response.data);
+      } catch(error){
+
+      }
+  };
 
   return (
     <header>
@@ -55,12 +83,12 @@ function Header() {
                   aria-labelledby="userDropdown"
                 >
                   <li>
-                    <Link to="/login" className="dropdown-item" onClick={changeNav}>
+                    <Link to="#" className="dropdown-item" onClick={handleLogin}>
                       Login
                     </Link>
                   </li>
                   <li>
-                    <Link to="/register" className="dropdown-item" onClick={changeNav}>
+                    <Link to="#" className="dropdown-item" onClick={handleRegister}>
                       Sign Up
                     </Link>
                   </li>
@@ -69,15 +97,7 @@ function Header() {
             </ul>
           </div>
 
-          <div className="d-inline-block d-lg-none">
-            <button type="button" className="btn btn-outline-dark">
-              <FontAwesomeIcon icon={["fas", "shopping-cart"]} />
-              <span className="ms-3 badge rounded-pill bg-dark">0</span>
-            </button>
-            <button className="navbar-toggler p-0 border-0 ms-3" type="button" onClick={toggleDrawer}>
-              <span className="navbar-toggler-icon"></span>
-            </button>
-          </div>
+          
         </div>
       </nav>
     </header>
