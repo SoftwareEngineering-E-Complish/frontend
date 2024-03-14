@@ -2,20 +2,26 @@ import React, {useState} from 'react';
 import './landing.css'; 
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import { useSearch } from '../SearchContext';
 
 
 function NewLandingPage() {
 
   const navigate = useNavigate();
   const [userInput, setUserInput] = useState('');
+  const { setSearchResults } = useSearch();
 
   const search = async () => {
-    try{
-      const requestBody = JSON.stringify(userInput);
-      const response = axios.post("/searchendpoint", requestBody);
-      const searchResults = response.data;
-      
-      navigate('/properties' ,{ state: { searchResults }}); 
+  
+  try {
+    const response = await axios.get("http://localhost:8004/properties", {
+      params: { user_query: userInput }
+    });
+    const searchResults = response.data;
+    console.log(searchResults, "results");
+
+    setSearchResults(searchResults); // Set search results in global state
+    navigate('/properties');
     } catch(error) {
       navigate('/properties')
     }

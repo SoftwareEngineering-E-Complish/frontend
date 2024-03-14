@@ -3,11 +3,13 @@ import { Link , useParams} from "react-router-dom";
 import { housesData } from'../../mockdata';
 import { faMapMarkerAlt } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { useSearch } from '../../SearchContext';
 
 function RelatedProduct(props) {
   let { id } = useParams();
   console.log("id" + id);
-  const property = housesData.find(house => house.id === Number(id) + props.index);
+  const { searchResults } = useSearch();
+  const property = searchResults.find(p => p.propertyId === id);
   
     
   return (
@@ -26,7 +28,7 @@ function RelatedProduct(props) {
         />
         <div className="card-body">
           <h5 className="card-title text-dark text-truncate">
-            {property.name}
+            {property.title}
           </h5>
           <div className=" mb-2">
             <FontAwesomeIcon icon={faMapMarkerAlt} /> {property.country}
@@ -40,7 +42,7 @@ function RelatedProduct(props) {
               {`${property.price} $`}
             </button>
             <button type="button" className="btn btn-outline-dark btn-sm  rounded-pill mt-3" disabled>
-              {`${property.surface}`}
+              {`${property.square_meters}`}
             </button>
     </div>
           </div>

@@ -1,10 +1,11 @@
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import Product from "./Product";
 import ProductH from "./ProductH";
 import { useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import ScrollToTopOnMount from "../template/ScrollToTopOnMount";
 import { housesData } from "../mockdata";
+import { useSearch } from '../SearchContext';
 
 const categories = [
   "Houses for Sale",
@@ -120,6 +121,10 @@ function FilterMenuLeft() {
 
 function ProductList() {
   const [viewType, setViewType] = useState({ grid: true });
+  //const results = housesData;
+  const location = useLocation();
+  const { searchResults } = useSearch();
+  const results = searchResults || housesData;
 
   function changeViewType() {
     setViewType({
@@ -245,14 +250,14 @@ function ProductList() {
             (viewType.grid ? "row-cols-xl-3" : "row-cols-xl-2")
           }
         >
-          {housesData.map((product, i) => {
+          {results.map((product, i) => {
             if (viewType.grid) {
               return (
-                <Product key={product.id} productId={product.id} />
+                <Product key={product.propertyId} product={product} />
               );
             }
             return (
-              <ProductH key={product.id} productId={product.id} />
+              <ProductH key={product.propertyId} product={product} />
             );
           })}
         </div>

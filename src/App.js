@@ -1,9 +1,12 @@
 import AppRouter from "./components/routing/routers/AppRouter";
+import { SearchProvider } from './SearchContext';
 
 
 const App = () => {
   return (
-      <AppRouter />
+    <SearchProvider>
+       <AppRouter />
+    </SearchProvider>
   );
 }
 
