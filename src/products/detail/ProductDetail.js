@@ -16,6 +16,7 @@ function ProductDetail() {
   //const { property } = location.state || {};
   //const property = housesData.find(house => house.propertyId === Number(id));
   const agent = housesData[0].agent;
+  const image = housesData[1].imageLg;
 
   return (
     <div className="container mt-5 py-4 px-xl-5">
@@ -48,7 +49,7 @@ function ProductDetail() {
                     <img
                       className={"rounded mb-2 ratio " + selected}
                       alt=""
-                      src={property.imageLg}
+                      src={image}
                     />
                   </a>
                 );
@@ -62,7 +63,7 @@ function ProductDetail() {
               <img
                 className="border rounded ratio ratio-1x1"
                 alt=""
-                src={property.imageLg}
+                src={image}
               />
             </div>
           </div>

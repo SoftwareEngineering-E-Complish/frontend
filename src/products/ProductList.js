@@ -124,7 +124,9 @@ function ProductList() {
   //const results = housesData;
   const location = useLocation();
   const { searchResults } = useSearch();
+ 
   const results = searchResults || housesData;
+  //const results = searchResults.length > 0 ? searchResults : housesData;
 
   function changeViewType() {
     setViewType({

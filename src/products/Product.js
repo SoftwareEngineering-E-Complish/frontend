@@ -9,6 +9,7 @@ function Product({ product }) {
 
   //const property = housesData.find(house => house.propertyId === productId);
   const property = product;
+  const image = housesData[1].image;
 
   return (
     <div className="col">
@@ -22,7 +23,7 @@ function Product({ product }) {
             className="card-img-top bg-dark cover rounded-corners-image"
             height="200"
             alt=""
-            src={property.image}
+            src={image}
           />
         </Link>
         <div className="card-body">

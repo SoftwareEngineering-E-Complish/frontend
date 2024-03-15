@@ -3,6 +3,7 @@ import './landing.css';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { useSearch } from '../SearchContext';
+import { housesData } from '../mockdata';
 
 
 function NewLandingPage() {
@@ -19,8 +20,8 @@ function NewLandingPage() {
     });
     const searchResults = response.data;
     console.log(searchResults, "results");
-
-    setSearchResults(searchResults); // Set search results in global state
+    
+    setSearchResults(searchResults); 
     navigate('/properties');
     } catch(error) {
       navigate('/properties')
@@ -31,7 +32,7 @@ function NewLandingPage() {
     <div className="full-background">
       <div className="search-container">
       <h1 className="search-header">Find <span style={{ color: '#E0FFFF' }}>Your</span> Dream Home</h1>
-      <h2 className="search-subheader">Using <span style={{ color: '#E0FFFF' }}>Your</span> own words</h2>
+      <h2 className="search-subheader">Using <span style={{ color: '#E0FFFF' }}>Your</span> Own Words</h2>
       <input 
           type="text" 
           className="search-input" 

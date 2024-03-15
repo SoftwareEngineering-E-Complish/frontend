@@ -10,6 +10,7 @@ function RelatedProduct(props) {
   console.log("id" + id);
   const { searchResults } = useSearch();
   const property = searchResults.find(p => p.propertyId === id);
+  const image = housesData[3].image;
   
     
   return (
@@ -24,7 +25,7 @@ function RelatedProduct(props) {
           className="card-img-top bg-dark cover"
           height="200"
           alt=""
-          src={property.image}
+          src={image}
         />
         <div className="card-body">
           <h5 className="card-title text-dark text-truncate">
