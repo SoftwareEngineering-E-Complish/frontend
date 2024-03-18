@@ -56,7 +56,9 @@ function Header() {
             />
             <span className="ms-2 h5">BinaRentalApp</span>
           </Link>
-
+          <Link className="navbar-brand" to="/createAdd" onClick={changeNav}>
+            <span className="ms-2 h7">Create New Add</span>
+          </Link>
           <div className={"navbar-collapse offcanvas-collapse " + (openedDrawer ? 'open' : '')}>
             <ul className="navbar-nav me-auto mb-lg-0">
               <li className="nav-item">

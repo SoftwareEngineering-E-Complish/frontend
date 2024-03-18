@@ -6,6 +6,7 @@ import ProductList from "../../../products/ProductList";
 import Login from "../../../pages/Login";
 import Register from "../../../pages/Register";
 import Profile from "../../../pages/Profile";
+import CreateAdd from "../../../pages/CreateAdd";
 
 const AppRouter = () => {
   return (
@@ -19,6 +20,8 @@ const AppRouter = () => {
         <Route path="/register" element = {<Register />}>
         </Route>
         <Route path="/profile" element = {<Profile />}>
+        </Route>
+        <Route path="/createAdd" element = {<CreateAdd />}>
         </Route>
         <Route path="/" element = {<Landing />}>
         </Route>
