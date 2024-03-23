@@ -6,6 +6,7 @@ import ProductList from "../../../products/ProductList";
 import Login from "../../../pages/Login";
 import Register from "../../../pages/Register";
 import Profile from "../../../pages/Profile";
+import Callback from "../../../pages/Callback";
 
 const AppRouter = () => {
   return (
@@ -21,6 +22,8 @@ const AppRouter = () => {
         <Route path="/profile" element = {<Profile />}>
         </Route>
         <Route path="/" element = {<Landing />}>
+        </Route>
+        <Route path="/callback" element = {<Callback />}>
         </Route>
       </Routes>
   );
