@@ -8,7 +8,7 @@ function Callback() {
   const authorizationCode = searchParams.get('code');
 
   const handleCallback = async (event) => {
-    event.preventDefault();
+    if(event) event.preventDefault();
     try {
       const response = await axios.get("http://localhost:8005/session",{params: { authorizationCode: authorizationCode}});
       console.log("Access Token: " + response.data.access_token);
@@ -29,8 +29,7 @@ function Callback() {
     }
   });
 
-  // Loading screen or other indication that token exchange is happening
-  return <div>Exchanging code for tokens...</div>;
+  return <div>Completing the login...</div>;
 }
 
 export default Callback;
