@@ -1,16 +1,33 @@
-import React from "react";
-import {Navigate, Outlet} from "react-router-dom";
-import PropTypes from "prop-types";
+import React, { useEffect, useState } from 'react';
+import { useNavigate, Outlet } from 'react-router-dom';
+import axios from 'axios';
 
 export const ProfileGuard = () => {
-    if (localStorage.getItem("accessToken")) {
+    const [isLoading, setIsLoading] = useState(false);
+    const navigate = useNavigate();
 
-        return <Outlet />;
+    useEffect(() => {
+        const initiateLogin = async () => {
+            setIsLoading(true);
+            try {
+                if (!localStorage.getItem("accessToken")) {
+                    const response = await axios.get("http://localhost:8005/loginURL");
+                    const loginURL = response.data;
+                    window.location.href = loginURL;
+                }
+            } catch (error) {
+                console.log(error);
+            } finally {
+                setIsLoading(false);
+            }
+        };
+
+        initiateLogin();
+    }, [navigate]);
+
+    if (isLoading) {
+        return <div>Loading...</div>;
     }
 
-    return <Navigate to="/" replace />;
+    return localStorage.getItem("accessToken") ? <Outlet /> : null;
 };
-
-ProfileGuard.propTypes = {
-    children: PropTypes.node
-}
