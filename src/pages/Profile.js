@@ -4,27 +4,22 @@ import axios from 'axios';
 function ProfilePage() {
     const accessToken = localStorage.getItem('accessToken');
 
-    const Spinner = () => (
-        <div className="spinner">User not found</div>
-    );
-
-    let content = <Spinner />;
+    let content = <div className="spinner">Loading...</div>;
 
     const [updateStatus, setUpdateStatus] = useState('');
     const [userData, setUserData] = useState();
 
-    const handleChange = (e) => {
+    const updateUserFields = (e) => {
         const { name, value } = e.target;
         setUserData({ ...userData, [name]: value });
     };
 
-    const handleSubmit = async (e) => {
+    const handleUpdateUserSubmit = async (e) => {
         e.preventDefault();
         try {
             await axios.post('http://localhost:8005/updateUser', userData);
             setUpdateStatus('success');
         } catch (error) {
-            console.error('Error updating user data:', error);
             setUpdateStatus('error');
         }
     };
@@ -33,10 +28,10 @@ function ProfilePage() {
         async function getUser() {
             try {
                 let response = await axios.get('http://localhost:8005/user', { params: { accessToken: accessToken } });
-                console.log(response.data);
                 setUserData(response.data);
             } catch (error) {
-                console.error('Error updating user data:', error);
+                console.error('Error fetching user data:', error);
+                content = <div className="spinner">User not found</div>;
             }
         }
         getUser();
@@ -51,13 +46,13 @@ function ProfilePage() {
                         <div className="card">
                             <div className="card-body">
                                 <div className="d-flex flex-column align-items-center text-center">
-                                    <img src={userData.image} alt="Admin" className="rounded-circle" width="150"></img>
                                     <div className="mt-3">
-                                        <h4>{userData.name}</h4>
-                                        <p className="text-primary mb-1">Rating: {userData.rating}</p>
+                                        <img src="https://bootdey.com/img/Content/avatar/avatar7.png" alt="Admin" className="rounded-circle" width="150" />
+                                        <h4>{userData.username}</h4>
+                                        {/* <p className="text-primary mb-1">Rating: {userData.rating}</p>
                                         <p className="text-muted font-size-sm">ciao</p>
                                         <button className="btn btn-primary me-1">Rate</button>
-                                        <button className="btn btn-outline-primary">Message</button>
+                                        <button className="btn btn-outline-primary">Message</button> */}
                                     </div>
                                 </div>
                             </div>
@@ -66,26 +61,13 @@ function ProfilePage() {
                     <div className="col-md-8">
                         <div className="card mb-3">
                             <div className="card-body">
-                                {updateStatus === 'success' && <div className="success-message">Update successful!</div>}
-                                {updateStatus === 'error' && <div className="error-message">Update failed. Please try again.</div>}
-                                <form onSubmit={handleSubmit}>
-                                    <div>
-                                        <label>Name:</label>
-                                        <input type="text" name="name" value={userData.name} onChange={handleChange} required />
-                                    </div>
-                                    <div>
-                                        <label>Email:</label>
-                                        <input type="email" name="email" value={userData.email} onChange={handleChange} required />
-                                    </div>
-                                    <div>
-                                        <label>Phone number:</label>
-                                        <input type="tel" name="phoneNumber" value={userData.phoneNumber} onChange={handleChange} required />
-                                    </div>
-                                    <div>
-                                        <label>Address:</label>
-                                        <input type="text" name="address" value={userData.address} onChange={handleChange} required />
-                                    </div>
-                                    <button type="submit">Update</button>
+                                {updateStatus === 'success' && <div className="alert alert-success">Update successful!</div>}
+                                {updateStatus === 'error' && <div className="alert alert-danger">Update failed. Please try again.</div>}
+                                <form onSubmit={handleUpdateUserSubmit}>
+                                    <ProfileField title="Name" type="text" name="name" value={userData.name} onChange={updateUserFields} />
+                                    <ProfileField title="Email" type="email" name="email" value={userData.email} onChange={updateUserFields} />
+                                    <ProfileField title="Phone Number" type="tel" name="phoneNumber" value={userData.phoneNumber} onChange={updateUserFields} />
+                                    <button type="submit" className="btn btn-primary">Update</button>
                                 </form>
                             </div>
                         </div>
@@ -116,7 +98,7 @@ function SocialLink({ iconClass, title, value }) {
     );
 }
 
-function ProfileField({ title, value }) {
+function ProfileField({ title, type, name, value, onChange }) {
     return (
         <>
             <div className="row">
@@ -124,7 +106,7 @@ function ProfileField({ title, value }) {
                     <h6 className="mb-0">{title}</h6>
                 </div>
                 <div className="col-sm-9 text-primary">
-                    {value}
+                    <input type={type} name={name} value={value} onChange={onChange} required />
                 </div>
             </div>
             <hr />
