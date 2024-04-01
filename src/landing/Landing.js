@@ -31,7 +31,7 @@ function NewLandingPage() {
   return (
     <div className="full-background">
       <div className="search-container">
-      <h1 className="search-header">Find <span style={{ color: '#E0FFFF' }}>Your</span> Dream Home</h1>
+      <h1 className="search-header">Test <span style={{ color: '#E0FFFF' }}>Your</span> Dream Home</h1>
       <h2 className="search-subheader">Using <span style={{ color: '#E0FFFF' }}>Your</span> Own Words</h2>
       <input 
           type="text" 

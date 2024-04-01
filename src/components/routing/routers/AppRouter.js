@@ -7,6 +7,8 @@ import Login from "../../../pages/Login";
 import Register from "../../../pages/Register";
 import Profile from "../../../pages/Profile";
 import Callback from "../../../pages/Callback";
+import {ProfileGuard} from "../routeProtectors/ProfileGuard.js";
+
 
 const AppRouter = () => {
   return (
@@ -19,7 +21,8 @@ const AppRouter = () => {
         </Route>
         <Route path="/register" element = {<Register />}>
         </Route>
-        <Route path="/profile" element = {<Profile />}>
+        <Route path="/profile" element={<ProfileGuard />}>
+            <Route path="/profile" element = {<Profile />}/>
         </Route>
         <Route path="/" element = {<Landing />}>
         </Route>
