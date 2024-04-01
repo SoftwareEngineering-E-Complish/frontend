@@ -119,8 +119,6 @@ function Header() {
               {profileField}
             </ul>
           </div>
-
-          
         </div>
       </nav>
     </header>
