@@ -3,7 +3,7 @@ import Product from "../../products/Product";
 import ProductH from "../../products/ProductH";
 import { useState } from "react";
 
-function ProductListBody(props) {
+function ProductListBody({ products }) {
     const [viewType, setViewType] = useState({ grid: true });
 
     function changeViewType() {
@@ -12,7 +12,7 @@ function ProductListBody(props) {
         });
     }
 
-    if (!props.products || props.products.length == 0) return <div className="spinner text-center">No properties found</div>;
+    if (!products || products.length == 0) return <div className="spinner text-center">No properties found</div>;
     return (
         <div className="d-flex flex-column h-100">
             <div className="row mb-3">
@@ -57,7 +57,7 @@ function ProductListBody(props) {
                     (viewType.grid ? "row-cols-xl-3" : "row-cols-xl-2")
                 }
             >
-                {props.products.map((product, i) => {
+                {products.map((product, i) => {
                     if (viewType.grid) {
                         return (
                             <Product key={product.propertyId} product={product} />
