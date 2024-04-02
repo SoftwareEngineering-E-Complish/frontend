@@ -8,11 +8,11 @@ export const ProfileGuard = () => {
 
     useEffect(() => {
         const initiateLogin = async () => {
-            const sendToLogin = false;
+            let sendToLogin = false;
 
             setIsLoading(true);
             try {
-                const accessToken = localStorage.getItem("accessToken");
+                let accessToken = localStorage.getItem("accessToken");
                 if (!accessToken) {
                     sendToLogin = true;
                 } else {
