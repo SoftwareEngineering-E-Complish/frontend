@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import ProductListBody from '../components/products/ProductListBody';
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { useNavigate } from 'react-router-dom';
 
 function ProfilePage() {
     const accessToken = localStorage.getItem('accessToken');
@@ -10,6 +12,7 @@ function ProfilePage() {
     const [updateStatus, setUpdateStatus] = useState('');
     const [userData, setUserData] = useState();
     const [userProperties, setUserProperties] = useState();
+    const navigate = useNavigate();
 
     const updateUserFields = (e) => {
         const { name, value } = e.target;
@@ -26,27 +29,40 @@ function ProfilePage() {
         }
     };
 
-    useEffect(() => {
-        async function getUser() {
-            try {
-                let response = await axios.get('http://localhost:8005/user', { params: { accessToken: accessToken } });
-                setUserData(response.data);
-            } catch (error) {
-                console.error('Error fetching user data:', error);
-                content = <div className="spinner">User not found</div>;
-            }
+    const handleDeleteUser = async (e) => {
+        e.preventDefault();
+        try {
+            await axios.get('http://localhost:8005/deleteUser', { params: { accessToken: accessToken } });
+            localStorage.removeItem('accessToken');
+            navigate('/');
+        } catch (error) {
+            navigate('/');
         }
-        getUser();
+    };
 
-        async function getUserProperties() {
+    useEffect(() => {
+        async function getUserProperties(username) {
             try {
-                let response = await axios.get(`http://localhost:8005/properties/${userData.username}`, { params: { accessToken: accessToken } });
+                let response = await axios.get(`http://localhost:8002/fetchPropertiesByUser`, { params: { userId: username /*accessToken: accessToken*/ } });
                 setUserProperties(response.data);
             } catch (error) {
                 console.error('Error fetching user properties:', error);
             }
         }
-        getUserProperties();
+
+        async function getUserData() {
+            try {
+                let response = await axios.get('http://localhost:8005/user', { params: { accessToken: accessToken } });
+                setUserData(response.data);
+
+                getUserProperties(response.data.username);
+            } catch (error) {
+                console.error('Error fetching user data:', error);
+                content = <div className="spinner">User not found</div>;
+            }
+        }
+
+        getUserData();
     }, []);
 
     if (userData) {
@@ -61,6 +77,9 @@ function ProfilePage() {
                                     <div className="mt-3">
                                         <img src="https://bootdey.com/img/Content/avatar/avatar7.png" alt="Admin" className="rounded-circle" width="150" />
                                         <h4>{userData.username}</h4>
+                                        <button className="btn btn-danger me-1" onClick={handleDeleteUser}>
+                                            <FontAwesomeIcon icon="fa-solid fa-trash" />
+                                        </button>
                                         {/* <p className="text-primary mb-1">Rating: {userData.rating}</p>
                                         <p className="text-muted font-size-sm">ciao</p>
                                         <button className="btn btn-primary me-1">Rate</button>

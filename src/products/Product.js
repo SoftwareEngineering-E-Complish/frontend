@@ -15,7 +15,7 @@ function Product({ product }) {
     <div className="col">
       <div className="card shadow-sm rounded-corners-card">
       <Link 
-        to={`/properties/${property.propertyId}`} 
+        to={`/properties/${property.propertyId}`}
         state={{ property }}
         replace
       >
