@@ -41,26 +41,28 @@ function ProfilePage() {
     };
 
     useEffect(() => {
-        async function getUser() {
+        async function getUserProperties(username) {
             try {
-                let response = await axios.get('http://localhost:8005/user', { params: { accessToken: accessToken } });
-                setUserData(response.data);
-            } catch (error) {
-                console.error('Error fetching user data:', error);
-                content = <div className="spinner">User not found</div>;
-            }
-        }
-        getUser();
-
-        async function getUserProperties() {
-            try {
-                let response = await axios.get(`http://localhost:8005/properties/${userData.username}`, { params: { accessToken: accessToken } });
+                let response = await axios.get(`http://localhost:8002/fetchPropertiesByUser`, { params: { userId: username /*accessToken: accessToken*/ } });
                 setUserProperties(response.data);
             } catch (error) {
                 console.error('Error fetching user properties:', error);
             }
         }
-        getUserProperties();
+
+        async function getUserData() {
+            try {
+                let response = await axios.get('http://localhost:8005/user', { params: { accessToken: accessToken } });
+                setUserData(response.data);
+
+                getUserProperties(response.data.username);
+            } catch (error) {
+                console.error('Error fetching user data:', error);
+                content = <div className="spinner">User not found</div>;
+            }
+        }
+
+        getUserData();
     }, []);
 
     if (userData) {
