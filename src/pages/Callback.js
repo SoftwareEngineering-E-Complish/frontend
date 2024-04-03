@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import axios from "axios";
+import axiosInstance from '../api/axiosInstance';
 
 function Callback() {
   const navigate = useNavigate();
@@ -8,25 +9,25 @@ function Callback() {
   const authorizationCode = searchParams.get('code');
 
   const handleCallback = async (event) => {
-    if(event) event.preventDefault();
+    if (event) event.preventDefault();
     try {
-      const response = await axios.get("http://localhost:8005/session",{params: { authorizationCode: authorizationCode}});
-      console.log("Access Token: " + response.data.access_token);
+      const response = await axiosInstance.get("/session", { params: { authorizationCode: authorizationCode } });
       localStorage.setItem("accessToken", response.data.access_token);
+      localStorage.setItem("refreshToken", response.data.refresh_token);
       localStorage.setItem("idToken", response.data.id_token);
 
       window.dispatchEvent(new CustomEvent('localStorageChange', {
         detail: {
           accessToken: response.data.access_token,
+          refreshToken: response.data.refresh_token,
           idToken: response.data.id_token
         }
       }));
-  
-      navigate("/");
-      } catch(error){
-        console.log(error);
 
-      }
+      navigate("/");
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   useEffect(() => {

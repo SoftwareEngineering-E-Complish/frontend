@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, Outlet } from 'react-router-dom';
-import axios from 'axios';
+import axiosInstance from '../../../api/axiosInstance';
 
 export const ProfileGuard = () => {
     const [isLoading, setIsLoading] = useState(false);
@@ -15,10 +15,17 @@ export const ProfileGuard = () => {
                 let accessToken = localStorage.getItem("accessToken");
                 if (!accessToken) {
                     sendToLogin = true;
+                    throw new Error("Access token not found");
                 } else {
-                    const response = await axios.get("http://localhost:8005/verifyAccessToken", { params: { accessToken: accessToken } });
+                    const response = await axiosInstance.get("/verifyAccessToken", { params: { accessToken: accessToken } });
                     if (response.data === false) {
-                        sendToLogin = true;
+                        let refreshToken = localStorage.getItem("refreshToken");
+                        const response = await axiosInstance.get("/refreshAccessToken", { params: { refreshToken: refreshToken } });
+                        console.log(response)
+                        if (response.data === false) {
+                            sendToLogin = true;
+                            throw new Error("Refresh token not found");
+                        }
                     }
                 }
             } catch (error) {
@@ -26,9 +33,8 @@ export const ProfileGuard = () => {
             } finally {
                 setIsLoading(false);
                 if (sendToLogin) {
-                    const response = await axios.get("http://localhost:8005/loginURL");
-                    const loginURL = response.data;
-                    window.location.href = loginURL;
+                    const response = await axiosInstance.get("/loginURL");
+                    window.location.href = response.data;
                 }
             }
         };
