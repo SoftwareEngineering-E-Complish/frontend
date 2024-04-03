@@ -1,11 +1,11 @@
 import { useSearch } from '../../SearchContext';
-import axios from 'axios';
+import axiosInstance from '../../api/axiosInstance';
 
 const categories = [
-    "House",
-    "Apartment"
-  ];
-   
+  "House",
+  "Apartment"
+];
+
 //missing: set default form values
 function FilterMenuLeft() {
 
@@ -26,7 +26,7 @@ function FilterMenuLeft() {
       order: formValues.order
     };
   };
-  
+
   const { formValues, handleInputChange, setSearchResults } = useSearch();
 
   const handleApplyFilters = async () => {
@@ -39,7 +39,7 @@ function FilterMenuLeft() {
     }, {});
 
     try {
-      const response = await axios.get("http://localhost:8004/queryProperties", {
+      const response = await axiosInstance.get("http://localhost:8004/queryProperties", {
         params: filteredParams
       });
       const searchResults = response.data.entries;
@@ -48,9 +48,9 @@ function FilterMenuLeft() {
       console.log(formValues, "filter state");
       console.log(filteredParams, "params")
       setSearchResults(searchResults);
-      } catch(error) {
-      }
-    };
+    } catch (error) {
+    }
+  };
   return (
     <ul className="list-group list-group-flush rounded">
       <li className="list-group-item d-none d-lg-block">
@@ -109,81 +109,81 @@ function FilterMenuLeft() {
       </li>
 
       <li className="list-group-item">
-      <h5 className="mt-1 mb-2">Bedrooms</h5>
+        <h5 className="mt-1 mb-2">Bedrooms</h5>
         <div className="d-grid d-block mb-3">
           <div className="form-floating mb-2">
-          <select
-            name="bedroomMin"
-            onChange={handleInputChange}
-            className="form-control"
-            value={formValues.bedroomMin}
-          >
-            <option value="">Min</option> {formValues.bedroomMin}
-            {Array.from({ length: 11 }, (_, index) => (
-              <option key={index} value={index}>
-                {index}
-              </option>
-            ))}
-          </select>
-          <label htmlFor="floatingInput">Min bedrooms</label>
+            <select
+              name="bedroomMin"
+              onChange={handleInputChange}
+              className="form-control"
+              value={formValues.bedroomMin}
+            >
+              <option value="">Min</option> {formValues.bedroomMin}
+              {Array.from({ length: 11 }, (_, index) => (
+                <option key={index} value={index}>
+                  {index}
+                </option>
+              ))}
+            </select>
+            <label htmlFor="floatingInput">Min bedrooms</label>
           </div>
           <div className="form-floating mb-2">
-          <select
-            name="bedroomMax"
-            onChange={handleInputChange}
-            className="form-control"
-            value={formValues.bedroomMax}
-          >
-            <option value="">Max</option> {}
-            {Array.from({ length: 11 }, (_, index) => (
-              <option key={index} value={index}>
-                {index}
-            </option>
-            ))}
-          </select>
-          <label htmlFor="floatingInput">Max bedrooms</label>
+            <select
+              name="bedroomMax"
+              onChange={handleInputChange}
+              className="form-control"
+              value={formValues.bedroomMax}
+            >
+              <option value="">Max</option> { }
+              {Array.from({ length: 11 }, (_, index) => (
+                <option key={index} value={index}>
+                  {index}
+                </option>
+              ))}
+            </select>
+            <label htmlFor="floatingInput">Max bedrooms</label>
           </div>
         </div>
       </li>
       <li className="list-group-item">
-      <h5 className="mt-1 mb-2">Bathrooms</h5>
+        <h5 className="mt-1 mb-2">Bathrooms</h5>
         <div className="d-grid d-block mb-3">
           <div className="form-floating mb-2">
-          <select
-            name="bathroomMin"
-            onChange={handleInputChange}
-            className="form-control"
-            value={formValues.bathroomMin}
-          >
-            <option value="">Min</option> {/* Optional placeholder-like option */}
-            {Array.from({ length: 11 }, (_, index) => (
-              <option key={index} value={index}>
-                {index}
-              </option>
-            ))}
-          </select>
-          <label htmlFor="floatingInput">Min bathrooms</label>
+            <select
+              name="bathroomMin"
+              onChange={handleInputChange}
+              className="form-control"
+              value={formValues.bathroomMin}
+            >
+              <option value="">Min</option> {/* Optional placeholder-like option */}
+              {Array.from({ length: 11 }, (_, index) => (
+                <option key={index} value={index}>
+                  {index}
+                </option>
+              ))}
+            </select>
+            <label htmlFor="floatingInput">Min bathrooms</label>
           </div>
           <div className="form-floating mb-2">
-          <select
-            name="bathroomMax"
-            onChange={handleInputChange}
-            className="form-control"
-            value={formValues.bathroomMax}
-          >
-            <option value="">Max</option> {}
-            {Array.from({ length: 11 }, (_, index) => (
-              <option key={index} value={index}>
-                {index}
-            </option>
-            ))}
-          </select>
-          <label htmlFor="floatingInput">Max bathrooms</label>
+            <select
+              name="bathroomMax"
+              onChange={handleInputChange}
+              className="form-control"
+              value={formValues.bathroomMax}
+            >
+              <option value="">Max</option> { }
+              {Array.from({ length: 11 }, (_, index) => (
+                <option key={index} value={index}>
+                  {index}
+                </option>
+              ))}
+            </select>
+            <label htmlFor="floatingInput">Max bathrooms</label>
           </div>
         </div>
       </li>
-      
-      
+
+
       <li className="list-group-item">
         <h5 className="mt-1 mb-2">Living Space</h5>
         <div className="d-grid d-block mb-3">
