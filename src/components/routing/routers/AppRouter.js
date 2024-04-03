@@ -1,7 +1,7 @@
 import React from "react";
 import {BrowserRouter, Route, Routes} from "react-router-dom";
 import ProductDetail from "../../../products/detail/ProductDetail";
-import Landing from "../../../landing/Landing";
+import Landing from "../../../pages/Landing.js";
 import ProductList from "../../../products/ProductList";
 import Login from "../../../pages/Login";
 import Register from "../../../pages/Register";

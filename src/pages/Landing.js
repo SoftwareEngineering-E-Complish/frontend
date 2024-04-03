@@ -1,10 +1,8 @@
 import React, {useState} from 'react';
-import './landing.css'; 
+import '../styles/landing.css'; 
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { useSearch } from '../SearchContext';
-import { housesData } from '../mockdata';
-
 
 function NewLandingPage() {
 
@@ -31,7 +29,7 @@ function NewLandingPage() {
   return (
     <div className="full-background">
       <div className="search-container">
-      <h1 className="search-header">Test <span style={{ color: '#E0FFFF' }}>Your</span> Dream Home</h1>
+      <h1 className="search-header">Find <span style={{ color: '#E0FFFF' }}>Your</span> Dream Home</h1>
       <h2 className="search-subheader">Using <span style={{ color: '#E0FFFF' }}>Your</span> Own Words</h2>
       <input 
           type="text" 
