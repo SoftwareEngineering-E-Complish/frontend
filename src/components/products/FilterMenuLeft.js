@@ -8,20 +8,18 @@ import ProductListBody from "./ProductListBody";
 const brands = ["1-3", "3-4", "4-6", "6 +"];
 const manufacturers = ["30sqm - 60sqm", "60sqm - 90sqm", "90sqm - 120sqm", "120sqm +"];
 const categories = [
-    "Houses for Sale",
-    "Apartments for Sale",
-    "Houses for Rent",
-    "Apartments",
-    "Apartments for Rent",
-    "Houses",
+    "House",
+    "Apartment"
   ];
   
-
+  
+//missing: set default form values
 function FilterMenuLeft() {
+  const { formValues, handleInputChange } = useSearch();
   return (
     <ul className="list-group list-group-flush rounded">
       <li className="list-group-item d-none d-lg-block">
-        <h5 className="mt-1 mb-2">Browse</h5>
+        <h5 className="mt-1 mb-2">Property Type</h5>
         <div className="d-flex flex-wrap my-2">
           {categories.map((v, i) => {
             return (
@@ -38,38 +36,23 @@ function FilterMenuLeft() {
         </div>
       </li>
       <li className="list-group-item">
-        <h5 className="mt-1 mb-1">Rooms</h5>
-        <div className="d-flex flex-column">
-          {brands.map((v, i) => {
-            return (
-              <div key={i} className="form-check">
-                <input className="form-check-input" type="checkbox" />
-                <label className="form-check-label" htmlFor="flexCheckDefault">
-                  {v}
-                </label>
-              </div>
-            );
-          })}
-        </div>
-      </li>
-      <li className="list-group-item">
-        <h5 className="mt-1 mb-3">Living space</h5>
-        <div className="d-flex flex-column">
-          {manufacturers.map((v, i) => {
-            return (
-              <div key={i} className="form-check">
-                <input className="form-check-input" type="checkbox" />
-                <label className="form-check-label" htmlFor="flexCheckDefault">
-                  {v}
-                </label>
-              </div>
-            );
-          })}
+        <h5 className="mt-1 mb-2">Price</h5>
+        <div className="d-grid d-block mb-3">
+          <input
+            name="priceMax"
+            type="range"
+            min="0"
+            max="500000"
+            value={formValues.priceMax}
+            onChange={handleInputChange}
+            className="form-control-range"
+          />
+          <div>Max Price: ${formValues.priceMax.toLocaleString()}</div>
         </div>
       </li>
       <li className="list-group-item">
         <h5 className="mt-1 mb-1">Location</h5>
-        <div className="col-lg-3 d-none d-lg-block">
+        <div className="d-grid d-block mb-3">
           <select
             className="form-select"
             aria-label="Default select example"
@@ -89,28 +72,137 @@ function FilterMenuLeft() {
         </div>
       </li>
       <li className="list-group-item">
-        <h5 className="mt-1 mb-2">Price Range</h5>
+      <h5 className="mt-1 mb-2">Bedrooms</h5>
+        <div className="d-grid d-block mb-3">
+          <div className="form-floating mb-2">
+          <select
+            name="bedroomMin"
+            onChange={handleInputChange}
+            className="form-control"
+            value={formValues.bedroomMin}
+          >
+            <option value="">{formValues.bedroomMin}</option> {/* Optional placeholder-like option */}
+            {Array.from({ length: 11 }, (_, index) => (
+              <option key={index} value={index}>
+                {index}
+              </option>
+            ))}
+          </select>
+          <label htmlFor="floatingInput">Min bedrooms</label>
+          </div>
+          <div className="form-floating mb-2">
+          <select
+            name="bedroomMax"
+            onChange={handleInputChange}
+            className="form-control"
+            value={formValues.bedroomMax}
+          >
+            <option value="">{formValues.bedroomMax}</option> {}
+            {Array.from({ length: 11 }, (_, index) => (
+              <option key={index} value={index}>
+                {index}
+            </option>
+            ))}
+          </select>
+          <label htmlFor="floatingInput">Max bedrooms</label>
+          </div>
+        </div>
+      </li>
+      <li className="list-group-item">
+      <h5 className="mt-1 mb-2">Bathrooms</h5>
+        <div className="d-grid d-block mb-3">
+          <div className="form-floating mb-2">
+          <select
+            name="bathroomMin"
+            onChange={handleInputChange}
+            className="form-control"
+            value={formValues.bathroomMin}
+          >
+            <option value="">{formValues.bathroomMin}</option> {/* Optional placeholder-like option */}
+            {Array.from({ length: 11 }, (_, index) => (
+              <option key={index} value={index}>
+                {index}
+              </option>
+            ))}
+          </select>
+          <label htmlFor="floatingInput">Min bathrooms</label>
+          </div>
+          <div className="form-floating mb-2">
+          <select
+            name="bathroomMax"
+            onChange={handleInputChange}
+            className="form-control"
+            value={formValues.bathroomMax}
+          >
+            <option value="">{formValues.bathroomMax}</option> {}
+            {Array.from({ length: 11 }, (_, index) => (
+              <option key={index} value={index}>
+                {index}
+            </option>
+            ))}
+          </select>
+          <label htmlFor="floatingInput">Max bathrooms</label>
+          </div>
+        </div>
+      </li>
+      
+      
+      <li className="list-group-item">
+        <h5 className="mt-1 mb-2">Living Space</h5>
         <div className="d-grid d-block mb-3">
           <div className="form-floating mb-2">
             <input
+              name="squareMetersMin"
+              onChange={handleInputChange}
               type="text"
               className="form-control"
               placeholder="Min"
-              defaultValue="100000"
+              defaultValue={formValues.squareMetersMin}
             />
-            <label htmlFor="floatingInput">Min Price</label>
+            <label htmlFor="floatingInput">Min Surface</label>
           </div>
           <div className="form-floating mb-2">
             <input
+              name="squareMetersMin"
+              onChange={handleInputChange}
               type="text"
               className="form-control"
               placeholder="Max"
-              defaultValue="500000"
+              defaultValue={formValues.squareMetersMax}
             />
-            <label htmlFor="floatingInput">Max Price</label>
+            <label htmlFor="floatingInput">Max Surface</label>
           </div>
-          <button className="btn btn-dark">Apply</button>
         </div>
+      </li>
+      <li className="list-group-item">
+        <h5 className="mt-1 mb-2">Year of construction</h5>
+        <div className="d-grid d-block mb-3">
+          <div className="form-floating mb-2">
+            <input
+              name="yearBuiltMin"
+              onChange={handleInputChange}
+              type="text"
+              className="form-control"
+              placeholder="Min"
+              defaultValue={formValues.yearBuiltMin}
+            />
+            <label htmlFor="floatingInput">Min Year</label>
+          </div>
+          <div className="form-floating mb-2">
+            <input
+              name="yearBuiltMin"
+              onChange={handleInputChange}
+              type="text"
+              className="form-control"
+              placeholder="Max"
+              defaultValue={formValues.yearBuiltMax}
+            />
+            <label htmlFor="floatingInput">Max Year</label>
+          </div>
+        </div>
+      </li>
+      <li className="list-group-item">
+        <button className="btn btn-dark">Apply</button>
       </li>
     </ul>
   );

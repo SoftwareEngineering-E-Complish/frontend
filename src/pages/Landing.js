@@ -43,5 +43,4 @@ function NewLandingPage() {
   );
 }
 
-
 export default NewLandingPage;
