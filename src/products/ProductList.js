@@ -1,18 +1,13 @@
 import { Link, useLocation } from "react-router-dom";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import ScrollToTopOnMount from "../template/ScrollToTopOnMount";
-import { housesData } from "../mockdata";
 import { useSearch } from '../SearchContext';
 import ProductListBody from "../components/products/ProductListBody";
 import FilterMenuLeft from "../components/products/FilterMenuLeft";
 
 function ProductList() {
   //const results = housesData;
-  const location = useLocation();
   const { searchResults } = useSearch();
 
-  // const results = searchResults || housesData;
-  const results = searchResults.length > 0 ? searchResults : housesData;
 
   return (
     <div className="container mt-5 py-4 px-xl-5">
@@ -70,7 +65,7 @@ function ProductList() {
           </div>
         </div>
         <div className="col-lg-9">
-          <ProductListBody products={results} />
+          <ProductListBody products={searchResults} />
         </div>
       </div>
     </div>
