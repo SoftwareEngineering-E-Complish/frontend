@@ -10,16 +10,17 @@ export const SearchProvider = ({ children }) => {
   const [formValues, setFormValues] = useState({
     priceMin: 0,
     priceMax: 50000,
-    bedroomMin: null,
-    bedroomMax: null,
-    bathroomMin: null,
-    bathroomMax: null,
-    squareMetersMin: null,
-    squareMetersMax: null,
-    yearBuiltMin: null,
-    yearBuiltMax: null,
-    propertyType: null,
+    bedroomMin: 1,
+    bedroomMax: 1,
+    bathroomMin: 1,
+    bathroomMax: 1,
+    squareMetersMin: 0,
+    squareMetersMax: 200,
+    yearBuiltMin: 1990,
+    yearBuiltMax: 2010,
+    propertyType: "House",
     location: null,
+    order:null
   });
 
   const handleInputChange = (event) => {

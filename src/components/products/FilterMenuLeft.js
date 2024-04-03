@@ -1,40 +1,73 @@
-import { Link, useLocation } from "react-router-dom";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import ScrollToTopOnMount from "../../template/ScrollToTopOnMount";
-import { housesData } from "../../mockdata";
 import { useSearch } from '../../SearchContext';
-import ProductListBody from "./ProductListBody";
+import axios from 'axios';
 
-const brands = ["1-3", "3-4", "4-6", "6 +"];
-const manufacturers = ["30sqm - 60sqm", "60sqm - 90sqm", "90sqm - 120sqm", "120sqm +"];
 const categories = [
     "House",
     "Apartment"
   ];
-  
-  
+   
 //missing: set default form values
 function FilterMenuLeft() {
-  const { formValues, handleInputChange } = useSearch();
+
+  const mapFormValuesToQueryParams = (formValues) => {
+    return {
+      price_min: formValues.priceMin,
+      price_max: formValues.priceMax,
+      bedrooms_min: formValues.bedroomMin,
+      bedrooms_max: formValues.bedroomMax,
+      bathroom_min: formValues.bathroomMin,
+      bathroom_max: formValues.bathroomMax,
+      square_meters_min: formValues.squareMetersMin,
+      square_meters_max: formValues.squareMetersMax,
+      year_built_from: formValues.yearBuiltMin,
+      year_built_to: formValues.yearBuiltMax,
+      property_type: formValues.propertyType,
+      location: formValues.location,
+      order: formValues.order
+    };
+  };
+  
+  const { formValues, handleInputChange, setSearchResults } = useSearch();
+
+  const handleApplyFilters = async () => {
+    const queryParams = mapFormValuesToQueryParams(formValues);
+    const filteredParams = Object.entries(queryParams).reduce((acc, [key, value]) => {
+      if (value !== null && value !== undefined) {
+        acc[key] = value;
+      }
+      return acc;
+    }, {});
+
+    try {
+      const response = await axios.get("http://localhost:8004/queryProperties", {
+        params: filteredParams
+      });
+      const searchResults = response.data.entries;
+      console.log(response.data, "response");
+      console.log(searchResults, "state");
+      console.log(formValues, "filter state");
+      console.log(filteredParams, "params")
+      setSearchResults(searchResults);
+      } catch(error) {
+      }
+    };
   return (
     <ul className="list-group list-group-flush rounded">
       <li className="list-group-item d-none d-lg-block">
         <h5 className="mt-1 mb-2">Property Type</h5>
         <div className="d-flex flex-wrap my-2">
-          {categories.map((v, i) => {
-            return (
-              <Link
-                key={i}
-                to="/products"
-                className="btn btn-sm btn-outline-dark rounded-pill me-2 mb-2"
-                replace
-              >
-                {v}
-              </Link>
-            );
-          })}
+          {categories.map((category, i) => (
+            <button
+              key={i}
+              className="btn btn-sm btn-outline-dark rounded-pill me-2 mb-2"
+              onClick={() => handleInputChange({ target: { name: 'propertyType', value: category } })}
+            >
+              {category}
+            </button>
+          ))}
         </div>
       </li>
+
       <li className="list-group-item">
         <h5 className="mt-1 mb-2">Price</h5>
         <div className="d-grid d-block mb-3">
@@ -42,7 +75,7 @@ function FilterMenuLeft() {
             name="priceMax"
             type="range"
             min="0"
-            max="500000"
+            max="10000000"
             value={formValues.priceMax}
             onChange={handleInputChange}
             className="form-control-range"
@@ -50,10 +83,13 @@ function FilterMenuLeft() {
           <div>Max Price: ${formValues.priceMax.toLocaleString()}</div>
         </div>
       </li>
+
       <li className="list-group-item">
         <h5 className="mt-1 mb-1">Location</h5>
         <div className="d-grid d-block mb-3">
           <select
+            name="location"
+            onChange={handleInputChange}
             className="form-select"
             aria-label="Default select example"
             defaultValue=""
@@ -71,6 +107,7 @@ function FilterMenuLeft() {
           </select>
         </div>
       </li>
+
       <li className="list-group-item">
       <h5 className="mt-1 mb-2">Bedrooms</h5>
         <div className="d-grid d-block mb-3">
@@ -81,7 +118,7 @@ function FilterMenuLeft() {
             className="form-control"
             value={formValues.bedroomMin}
           >
-            <option value="">{formValues.bedroomMin}</option> {/* Optional placeholder-like option */}
+            <option value="">Min</option> {formValues.bedroomMin}
             {Array.from({ length: 11 }, (_, index) => (
               <option key={index} value={index}>
                 {index}
@@ -97,7 +134,7 @@ function FilterMenuLeft() {
             className="form-control"
             value={formValues.bedroomMax}
           >
-            <option value="">{formValues.bedroomMax}</option> {}
+            <option value="">Max</option> {}
             {Array.from({ length: 11 }, (_, index) => (
               <option key={index} value={index}>
                 {index}
@@ -118,7 +155,7 @@ function FilterMenuLeft() {
             className="form-control"
             value={formValues.bathroomMin}
           >
-            <option value="">{formValues.bathroomMin}</option> {/* Optional placeholder-like option */}
+            <option value="">Min</option> {/* Optional placeholder-like option */}
             {Array.from({ length: 11 }, (_, index) => (
               <option key={index} value={index}>
                 {index}
@@ -134,7 +171,7 @@ function FilterMenuLeft() {
             className="form-control"
             value={formValues.bathroomMax}
           >
-            <option value="">{formValues.bathroomMax}</option> {}
+            <option value="">Max</option> {}
             {Array.from({ length: 11 }, (_, index) => (
               <option key={index} value={index}>
                 {index}
@@ -202,7 +239,7 @@ function FilterMenuLeft() {
         </div>
       </li>
       <li className="list-group-item">
-        <button className="btn btn-dark">Apply</button>
+        <button className="btn btn-dark" onClick={handleApplyFilters}>Apply</button>
       </li>
     </ul>
   );

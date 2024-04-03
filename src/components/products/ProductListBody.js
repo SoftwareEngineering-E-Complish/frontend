@@ -2,8 +2,10 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Product from "../../products/Product";
 import ProductH from "../../products/ProductH";
 import { useState } from "react";
+import { useSearch } from '../../SearchContext';
 
 function ProductListBody({ products }) {
+    const {handleInputChange} = useSearch();
     const [viewType, setViewType] = useState({ grid: true });
 
     function changeViewType() {
@@ -17,17 +19,26 @@ function ProductListBody({ products }) {
         <div className="d-flex flex-column h-100">
             <div className="row mb-3">
                 <div className="col-lg-3 d-none d-lg-block">
-                    <select
-                        className="form-select"
-                        aria-label="Default select example"
-                        defaultValue=""
-                    >
-                        <option value="">Newest first</option>
-                        <option value="1">Price (lowest first)</option>
-                        <option value="2">Price (highest first)</option>
-                        <option value="3">Surface (highest first)</option>
-                        <option value="4">Surface (lowest first)</option>
-                    </select>
+                <select
+                name="order"
+                className="form-select"
+                aria-label="Default select example"
+                defaultValue=""
+                onChange={handleInputChange}
+                >
+                <option value="">Select order</option> {/* Assuming you want a placeholder option */}
+                <option value="price_asc">Price (lowest first)</option>
+                <option value="price_desc">Price (highest first)</option>
+                <option value="square-meters-asc">Surface (lowest first)</option>
+                <option value="square-meters-desc">Surface (highest first)</option>
+                <option value="year-built-asc">Year (lowest first)</option>
+                <option value="year-built-desc">Year (highest first)</option>
+                <option value="bathrooms-asc">Number of bathrooms (lowest first)</option>
+                <option value="bathrooms-desc">Number of bathrooms (highest first)</option>
+                <option value="bedrooms-asc">Number of bedrooms (lowest first)</option>
+                <option value="bedrooms-desc">Number of bedrooms (highest first)</option>
+                </select>
+
                 </div>
                 <div className="col-lg-9 col-xl-5 offset-xl-4 d-flex flex-row">
                     <div className="input-group">
