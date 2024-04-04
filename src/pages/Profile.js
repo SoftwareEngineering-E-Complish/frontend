@@ -32,7 +32,7 @@ function ProfilePage() {
     const handleDeleteUser = async (e) => {
         e.preventDefault();
         try {
-            await axiosInstance.get('http://localhost:8005/deleteUser', { params: { accessToken: accessToken } });
+            await axiosInstance.get('/deleteUser', { params: { accessToken: accessToken } });
             localStorage.removeItem('accessToken');
             navigate('/');
         } catch (error) {
@@ -43,7 +43,7 @@ function ProfilePage() {
     useEffect(() => {
         async function getUserProperties(username) {
             try {
-                let response = await axiosInstance.get(`http://localhost:8002/fetchPropertiesByUser`, { params: { userId: username /*accessToken: accessToken*/ } });
+                let response = await axiosInstance.get(`/fetchPropertiesByUser`, { params: { userId: username /*accessToken: accessToken*/ } });
                 setUserProperties(response.data);
             } catch (error) {
                 console.error('Error fetching user properties:', error);
@@ -52,7 +52,7 @@ function ProfilePage() {
 
         async function getUserData() {
             try {
-                let response = await axiosInstance.get('http://localhost:8005/user', { params: { accessToken: accessToken } });
+                let response = await axiosInstance.get('/user', { params: { accessToken: accessToken } });
                 setUserData(response.data);
 
                 getUserProperties(response.data.username);
