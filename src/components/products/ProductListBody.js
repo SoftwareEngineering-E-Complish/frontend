@@ -3,17 +3,36 @@ import Product from "../../products/Product";
 import ProductH from "../../products/ProductH";
 import { useState } from "react";
 import { useSearch } from '../../SearchContext';
+import axiosInstance from '../../api/axiosInstance';
+import mapFormValuesToQueryParams from '../helpers/mapFormValuesToQueryParams'
+
 
 function ProductListBody({ products }) {
-    const {handleInputChange} = useSearch();
+    const {handleInputChange, queryInfo, setSearchResults, setQueryInfo, formValues} = useSearch();
     const [viewType, setViewType] = useState({ grid: true });
+    const currentPage = queryInfo.offset / queryInfo.limit + 1;
+    const totalPages = Math.ceil(queryInfo.total / queryInfo.limit);
+
+    const handleChangePage = async (newOffset) => {
+        const queryParams = mapFormValuesToQueryParams(formValues);
+        queryParams.offset = newOffset;
+        try {
+          const response = await axiosInstance.get("http://localhost:8004/queryProperties", {
+            params: queryParams
+          });
+          const { entries, total, offset, limit } = response.data;
+          setSearchResults(entries); 
+          setQueryInfo({ total, offset, limit });
+          } catch(error) {
+            
+          }
+        };
 
     function changeViewType() {
         setViewType({
             grid: !viewType.grid,
         });
     }
-
     if (!products || products.length == 0) return <div className="spinner text-center">No properties found</div>;
     return (
         <div className="d-flex flex-column h-100">
@@ -27,8 +46,8 @@ function ProductListBody({ products }) {
                 onChange={handleInputChange}
                 >
                 <option value="">Select order</option> {/* Assuming you want a placeholder option */}
-                <option value="price_asc">Price (lowest first)</option>
-                <option value="price_desc">Price (highest first)</option>
+                <option value="price-asc">Price (lowest first)</option>
+                <option value="price-desc">Price (highest first)</option>
                 <option value="square-meters-asc">Surface (lowest first)</option>
                 <option value="square-meters-desc">Surface (highest first)</option>
                 <option value="year-built-asc">Year (lowest first)</option>
@@ -79,41 +98,43 @@ function ProductListBody({ products }) {
                     );
                 })}
             </div>
-
             <div className="d-flex align-items-center mt-auto">
                 <span className="text-muted small d-none d-md-inline">
-                    Showing 10 of 100
+                    Showing {Math.min(queryInfo.limit + queryInfo.offset, queryInfo.total)} of {queryInfo.total}
                 </span>
                 <nav aria-label="Page navigation example" className="ms-auto">
                     <ul className="pagination my-0">
-                        <li className="page-item">
-                            <a className="page-link" href="!#">
-                                Previous
-                            </a>
+                    <li className={`page-item ${currentPage === 1 ? 'disabled' : ''}`}>
+                        <button
+                        className="page-link"
+                        onClick={() => currentPage > 1 && handleChangePage(queryInfo.offset - queryInfo.limit)}
+                        disabled={currentPage === 1}
+                        >
+                        Previous
+                        </button>
+                    </li>
+                    {[...Array(totalPages).keys()].map(pageNumber => (
+                        <li key={pageNumber} className={`page-item ${currentPage === pageNumber + 1 ? 'active' : ''}`}>
+                        <button
+                            className="page-link"
+                            //onClick={handleGetNext}
+                        >
+                            {pageNumber + 1}
+                        </button>
                         </li>
-                        <li className="page-item">
-                            <a className="page-link" href="!#">
-                                1
-                            </a>
-                        </li>
-                        <li className="page-item active">
-                            <a className="page-link" href="!#">
-                                2
-                            </a>
-                        </li>
-                        <li className="page-item">
-                            <a className="page-link" href="!#">
-                                3
-                            </a>
-                        </li>
-                        <li className="page-item">
-                            <a className="page-link" href="!#">
-                                Next
-                            </a>
-                        </li>
+                    ))}
+                    <li className={`page-item ${currentPage === totalPages ? 'disabled' : ''}`}>
+                        <button
+                        className="page-link"
+                        onClick={() => currentPage < totalPages && handleChangePage(queryInfo.offset + queryInfo.limit)}
+                        disabled={currentPage === totalPages}
+                        >
+                        Next
+                        </button>
+                    </li>
                     </ul>
                 </nav>
-            </div>
+                </div>
         </div>
     );
 }
