@@ -1,5 +1,6 @@
 import { useSearch } from '../../SearchContext';
 import axiosInstance from '../../api/axiosInstance';
+import mapFormValuesToQueryParams from '../helpers/mapFormValuesToQueryParams'
 
 const categories = [
   "House",
@@ -9,25 +10,9 @@ const categories = [
 //missing: set default form values
 function FilterMenuLeft() {
 
-  const mapFormValuesToQueryParams = (formValues) => {
-    return {
-      price_min: formValues.priceMin,
-      price_max: formValues.priceMax,
-      bedrooms_min: formValues.bedroomMin,
-      bedrooms_max: formValues.bedroomMax,
-      bathroom_min: formValues.bathroomMin,
-      bathroom_max: formValues.bathroomMax,
-      square_meters_min: formValues.squareMetersMin,
-      square_meters_max: formValues.squareMetersMax,
-      year_built_from: formValues.yearBuiltMin,
-      year_built_to: formValues.yearBuiltMax,
-      property_type: formValues.propertyType,
-      location: formValues.location,
-      order: formValues.order
-    };
-  };
 
-  const { formValues, handleInputChange, setSearchResults } = useSearch();
+
+  const { formValues, handleInputChange, setSearchResults, setQueryInfo } = useSearch();
 
   const handleApplyFilters = async () => {
     const queryParams = mapFormValuesToQueryParams(formValues);
@@ -42,12 +27,13 @@ function FilterMenuLeft() {
       const response = await axiosInstance.get("http://localhost:8004/queryProperties", {
         params: filteredParams
       });
-      const searchResults = response.data.entries;
+      const { entries, total, offset, limit } = response.data;
+
+      setSearchResults(entries); 
+      setQueryInfo({ total, offset, limit });
       console.log(response.data, "response");
-      console.log(searchResults, "state");
       console.log(formValues, "filter state");
       console.log(filteredParams, "params")
-      setSearchResults(searchResults);
     } catch (error) {
     }
   };
@@ -94,16 +80,17 @@ function FilterMenuLeft() {
             aria-label="Default select example"
             defaultValue=""
           >
-            <option value="">Zurich</option>
-            <option value="1">Basel</option>
-            <option value="2">Geneva</option>
-            <option value="3">Lausanne</option>
-            <option value="4">Bern</option>
-            <option value="4">Lucerne</option>
-            <option value="4">St. Gallen</option>
-            <option value="4">Biels</option>
-            <option value="4">Thun</option>
-            <option value="4">Winterthur</option>
+            <option value={null}>Anywhere</option>
+            <option value="Zurich">Zurich</option>
+            <option value="Basel">Basel</option>
+            <option value="Geneva">Geneva</option>
+            <option value="Lausanne">Lausanne</option>
+            <option value="Bern">Bern</option>
+            <option value="Lucerne">Lucerne</option>
+            <option value="St. Gallen">St. Gallen</option>
+            <option value="Biels">Biels</option>
+            <option value="Thun">Thun</option>
+            <option value="Winterthur">Winterthur</option>
           </select>
         </div>
       </li>

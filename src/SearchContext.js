@@ -9,11 +9,11 @@ export const SearchProvider = ({ children }) => {
 
   const [formValues, setFormValues] = useState({
     priceMin: 0,
-    priceMax: 50000,
+    priceMax: 10000000,
     bedroomMin: 1,
-    bedroomMax: 1,
+    bedroomMax: 8,
     bathroomMin: 1,
-    bathroomMax: 1,
+    bathroomMax: 8,
     squareMetersMin: 0,
     squareMetersMax: 200,
     yearBuiltMin: 1990,
@@ -22,6 +22,13 @@ export const SearchProvider = ({ children }) => {
     location: null,
     order:null
   });
+
+  const [queryInfo, setQueryInfo] = useState({
+    total: 0,
+    offset: 0,
+    limit: 10,
+  });
+  
 
   const handleInputChange = (event) => {
     const { name, value } = event.target;
@@ -36,7 +43,9 @@ export const SearchProvider = ({ children }) => {
       searchResults,
       setSearchResults,
       formValues,
-      handleInputChange, }}>
+      handleInputChange, 
+      queryInfo,
+      setQueryInfo}}>
       {children}
     </SearchContext.Provider>
   );
