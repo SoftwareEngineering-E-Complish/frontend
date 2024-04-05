@@ -80,7 +80,7 @@ function FilterMenuLeft() {
             aria-label="Default select example"
             defaultValue=""
           >
-            <option value={null}>Anywhere</option>
+            <option value="">Anywhere</option>
             <option value="Zurich">Zurich</option>
             <option value="Basel">Basel</option>
             <option value="Geneva">Geneva</option>

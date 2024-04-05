@@ -34,7 +34,7 @@ export const SearchProvider = ({ children }) => {
     const { name, value } = event.target;
     setFormValues({
       ...formValues,
-      [name]: value,
+      [name]: value !== "" ? value : null,
     });
   };
 
