@@ -1,77 +1,119 @@
-import React, { useState } from 'react';
-import { useLocation } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import ProductListBody from '../components/products/ProductListBody';
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { useNavigate } from 'react-router-dom';
+import axiosInstance from '../api/axiosInstance';
 
 function ProfilePage() {
-    //const [name, setName] = useState('John Doe'); 
-    //const [location, setLocation] = useState('Bay Area, San Francisco, CA'); 
-    const [website, setWebsite] = useState('https://bootdey.com'); 
-    const [github, setGithub] = useState('bootdey'); 
-    const [twitter, setTwitter] = useState('@bootdey'); 
-    const [instagram, setInstagram] = useState('bootdey'); 
-    const [facebook, setFacebook] = useState('bootdey'); 
-    const [email, setEmail] = useState('fip@jukmuh.al'); 
-    const [phone, setPhone] = useState('239-816-9029'); 
-    const [mobile, setMobile] = useState('320-380-4539'); 
-    const [address, setAddress] = useState('Bay Area, San Francisco, CA'); 
+    const accessToken = localStorage.getItem('accessToken');
 
-    const Spinner = () => (
-        <div className="spinner">User not found</div>
-      );
-    
-    const location = useLocation();
-    const agent = location.state ? location.state.agent : null;
-    console.log("agent " + JSON.stringify(agent));
+    let content = <div className="spinner">Loading...</div>;
 
-    let content = <Spinner />;
+    const [updateStatus, setUpdateStatus] = useState('');
+    const [userData, setUserData] = useState();
+    const [userProperties, setUserProperties] = useState();
+    const navigate = useNavigate();
 
-    if (agent) {
+    const updateUserFields = (e) => {
+        const { name, value } = e.target;
+        setUserData({ ...userData, [name]: value });
+    };
+
+    const handleUpdateUserSubmit = async (e) => {
+        e.preventDefault();
+        try {
+            await axiosInstance.post('/updateUser', userData);
+            setUpdateStatus('success');
+        } catch (error) {
+            setUpdateStatus('error');
+        }
+    };
+
+    const handleDeleteUser = async (e) => {
+        e.preventDefault();
+        try {
+            await axiosInstance.get('/deleteUser', { params: { accessToken: accessToken } });
+            localStorage.removeItem('accessToken');
+            navigate('/');
+        } catch (error) {
+            navigate('/');
+        }
+    };
+
+    useEffect(() => {
+        async function getUserProperties(username) {
+            try {
+                let response = await axiosInstance.get(`/fetchPropertiesByUser`, { params: { userId: username /*accessToken: accessToken*/ } });
+                setUserProperties(response.data);
+            } catch (error) {
+                console.error('Error fetching user properties:', error);
+            }
+        }
+
+        async function getUserData() {
+            try {
+                let response = await axiosInstance.get('/user', { params: { accessToken: accessToken } });
+                setUserData(response.data);
+
+                getUserProperties(response.data.username);
+            } catch (error) {
+                console.error('Error fetching user data:', error);
+                content = <div className="spinner">User not found</div>;
+            }
+        }
+
+        getUserData();
+    }, []);
+
+    if (userData) {
         content = (
             <div className="container mt-5">
-            {/* Profile widget */}
-            <div className="row gutters-sm">
-                <div className="col-md-4 mb-3">
-                    <div className="card">
-                        <div className="card-body">
-                            <div className="d-flex flex-column align-items-center text-center">
-                                <img src={agent.image} alt="Admin" className="rounded-circle" width="150"></img>
-                                <div className="mt-3">
-                                    <h4>{agent.name}</h4>
-                                    <p className="text-primary mb-1">Rating: {agent.rating}</p>
-                                    <p className="text-muted font-size-sm">ciao</p>
-                                    <button className="btn btn-primary me-1">Rate</button>
-                                    <button className="btn btn-outline-primary">Message</button>
+                {/* Profile widget */}
+                <div className="row gutters-sm">
+                    <div className="col-md-4 mb-3 flex-fill">
+                        <div className="card h-100">
+                            <div className="card-body">
+                                <div className="d-flex flex-column align-items-center text-center">
+                                    <div className="mt-3">
+                                        <img src="https://bootdey.com/img/Content/avatar/avatar7.png" alt="Admin" className="rounded-circle" width="150" />
+                                        <h4>{userData.username}</h4>
+                                        <button className="btn btn-danger me-1" onClick={handleDeleteUser}>
+                                            <FontAwesomeIcon icon="fa-solid fa-trash" />
+                                        </button>
+                                        {/* <p className="text-primary mb-1">Rating: {userData.rating}</p>
+                                        <p className="text-muted font-size-sm">ciao</p>
+                                        <button className="btn btn-primary me-1">Rate</button>
+                                        <button className="btn btn-outline-primary">Message</button> */}
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                    <div className="card mt-3">
-                        <ul className="list-group list-group-flush">
-                            <SocialLink iconClass="feather feather-globe" title="Website" value={website} />
-                            <SocialLink iconClass="feather feather-github" title="Github" value={github} />
-                            <SocialLink iconClass="feather feather-twitter" title="Twitter" value={twitter} />
-                            <SocialLink iconClass="feather feather-instagram" title="Instagram" value={instagram} />
-                            <SocialLink iconClass="feather feather-facebook" title="Facebook" value={facebook} />
-                        </ul>
+                    <div className="col-md-8">
+                        <div className="card mb-3">
+                            <h4 className="card-header">Personal Details</h4>
+                            <div className="card-body">
+                                {updateStatus === 'success' && <div className="alert alert-success">Update successful!</div>}
+                                {updateStatus === 'error' && <div className="alert alert-danger">Update failed. Please try again.</div>}
+                                <form onSubmit={handleUpdateUserSubmit}>
+                                    <ProfileField title="Name" type="text" name="name" value={userData.name} onChange={updateUserFields} />
+                                    <ProfileField title="Email" type="email" name="email" value={userData.email} onChange={updateUserFields} />
+                                    <ProfileField title="Phone Number" type="tel" name="phoneNumber" value={userData.phoneNumber} onChange={updateUserFields} />
+                                    <button type="submit" className="btn btn-primary">Update</button>
+                                </form>
+                            </div>
+                        </div>
                     </div>
-                </div>
-                <div className="col-md-8">
-                    <div className="card mb-3">
-                        <div className="card-body">
-                            <ProfileField title="Full Name" value={agent.name} />
-                            <ProfileField title="Email" value={agent.email} />
-                            <ProfileField title="Phone" value={agent.phone} />
-                            <ProfileField title="Mobile"  value={agent.phone} />
-                            <ProfileField title="Address" value={agent.adress} />
-                            <div className="row">
-                                <div className="col-sm-12">
-                                    <a className="btn btn-dark" target="__blank" href="https://www.bootdey.com/snippets/view/profile-edit-data-and-skills">Edit</a>
-                                </div>
+                    <div className="col-md-12">
+                        <div className="card mb-3">
+                            <h4 className="card-header">Your Properties</h4>
+                            <div className="card-body">
+                                <ProductListBody products={userProperties} />
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
         );
     }
 
@@ -96,7 +138,7 @@ function SocialLink({ iconClass, title, value }) {
     );
 }
 
-function ProfileField({ title, value }) {
+function ProfileField({ title, type, name, value, onChange }) {
     return (
         <>
             <div className="row">
@@ -104,7 +146,7 @@ function ProfileField({ title, value }) {
                     <h6 className="mb-0">{title}</h6>
                 </div>
                 <div className="col-sm-9 text-primary">
-                    {value}
+                    <input type={type} name={name} value={value} onChange={onChange} required />
                 </div>
             </div>
             <hr />

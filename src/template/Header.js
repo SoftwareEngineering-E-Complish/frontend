@@ -1,11 +1,13 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Link } from "react-router-dom";
-import { useState } from "react";
-import axios from "axios";
+import { useState, useEffect } from "react";
+import axiosInstance from "../api/axiosInstance";
 
 function Header() {
 
   const [openedDrawer, setOpenedDrawer] = useState(false)
+  const [loggedIn, setLoggedIn] = useState(false);
+  let profileField = (<div></div>);
 
   function toggleDrawer() {
     setOpenedDrawer(!openedDrawer);
@@ -16,34 +18,82 @@ function Header() {
       setOpenedDrawer(false)
     }
   }
-
-
   const handleRegister = async (event) => {
     event.preventDefault();
     try {
-      const response = await axios.get("http://localhost:8005/signupURL",);
+      const response = await axiosInstance.get("/signupURL");
       console.log("Signup URL: " + response.data);
-  
+
       //setSearchResults(searchResults); // Set search results in global state
       window.location.replace(response.data);
-      } catch(error){
+    } catch (error) {
 
-      }
+    }
   };
 
   const handleLogin = async (event) => {
     event.preventDefault();
     try {
-      const response = await axios.get("http://localhost:8005/loginURL",);
+      const response = await axiosInstance.get("/loginURL");
       console.log("Login URL: " + response.data);
-  
       //setSearchResults(searchResults); // Set search results in global state
       window.location.replace(response.data);
-      } catch(error){
+    } catch (error) {
 
-      }
+    }
   };
 
+  profileField = loggedIn ? (
+    <li className="nav-item">
+      <Link to="/profile" className="nav-link">
+        <FontAwesomeIcon icon={["fas", "user-alt"]} />
+      </Link>
+    </li>
+  ) : (
+    <li className="nav-item dropdown">
+      <a
+        href="#!"
+        className="nav-link dropdown-toggle"
+        id="userDropdown"
+        role="button"
+        data-bs-toggle="dropdown"
+        aria-expanded="false"
+      >
+        <FontAwesomeIcon icon={["fas", "user-alt"]} />
+      </a>
+      <ul className="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+        <li>
+          <Link to="#" className="dropdown-item" onClick={handleLogin}>
+            Login
+          </Link>
+        </li>
+        <li>
+          <Link to="#" className="dropdown-item" onClick={handleRegister}>
+            Sign Up
+          </Link>
+        </li>
+      </ul>
+    </li>
+  );
+
+  useEffect(() => {
+    const checkToken = () => {
+      const token = localStorage.getItem('accessToken');
+      console.log(token);
+      setLoggedIn(!!token);
+    };
+    checkToken();
+    const handleStorageChange = (event) => {
+      console.log("Local Storage Change Detected:", event.detail);
+      checkToken();
+    };
+
+    window.addEventListener('localStorageChange', handleStorageChange);
+    return () => window.removeEventListener('localStorageChange', handleStorageChange);
+
+  }, []);
+
+  console.log("logged in: " + loggedIn);
   return (
     <header>
       <nav className="navbar fixed-top navbar-expand-lg navbar-light bg-white border-bottom ">
@@ -68,38 +118,9 @@ function Header() {
               </li>
             </ul>
             <ul className="navbar-nav mb-2 mb-lg-0">
-              <li className="nav-item dropdown">
-                <a
-                  href="!#"
-                  className="nav-link dropdown-toggle"
-                  data-toggle="dropdown"
-                  id="userDropdown"
-                  role="button"
-                  data-bs-toggle="dropdown"
-                  aria-expanded="false"
-                >
-                  <FontAwesomeIcon icon={["fas", "user-alt"]} />
-                </a>
-                <ul
-                  className="dropdown-menu dropdown-menu-end"
-                  aria-labelledby="userDropdown"
-                >
-                  <li>
-                    <Link to="#" className="dropdown-item" onClick={handleLogin}>
-                      Login
-                    </Link>
-                  </li>
-                  <li>
-                    <Link to="#" className="dropdown-item" onClick={handleRegister}>
-                      Sign Up
-                    </Link>
-                  </li>
-                </ul>
-              </li>
+              {profileField}
             </ul>
           </div>
-
-          
         </div>
       </nav>
     </header>
