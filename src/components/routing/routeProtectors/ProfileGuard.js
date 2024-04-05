@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate, Outlet } from 'react-router-dom';
 import axiosInstance from '../../../api/axiosInstance';
 
-export const ProfileGuard = () => {
+export const LoggedInGuard = () => {
     const [isLoading, setIsLoading] = useState(false);
     const navigate = useNavigate();
 
@@ -13,18 +13,24 @@ export const ProfileGuard = () => {
             setIsLoading(true);
             try {
                 let accessToken = localStorage.getItem("accessToken");
-                if (!accessToken) {
+                if (!accessToken || accessToken === "undefined") {
                     sendToLogin = true;
                     throw new Error("Access token not found");
                 } else {
                     const response = await axiosInstance.get("/verifyAccessToken", { params: { accessToken: accessToken } });
                     if (response.data === false) {
                         let refreshToken = localStorage.getItem("refreshToken");
-                        const response = await axiosInstance.get("/refreshAccessToken", { params: { refreshToken: refreshToken } });
-                        console.log(response)
-                        if (response.data === false) {
+                        if (!refreshToken || refreshToken === "undefined") {
                             sendToLogin = true;
-                            throw new Error("Refresh token not found");
+                        } else {
+                            const response = await axiosInstance.get("/refreshAccessToken", { params: { refreshToken: refreshToken } });
+                            if (response.data === false) {
+                                sendToLogin = true;
+                                throw new Error("Refresh token not found");
+                            } else {
+                                localStorage.setItem("accessToken", response.data.accessToken);
+                                localStorage.setItem("refreshToken", response.data.refreshToken);
+                            }
                         }
                     }
                 }
@@ -48,3 +54,4 @@ export const ProfileGuard = () => {
 
     return localStorage.getItem("accessToken") ? <Outlet /> : null;
 };
+

@@ -14,7 +14,6 @@ function Callback() {
       const response = await axiosInstance.get("/session", { params: { authorizationCode: authorizationCode } });
       localStorage.setItem("accessToken", response.data.access_token);
       localStorage.setItem("refreshToken", response.data.refresh_token);
-      localStorage.setItem("idToken", response.data.id_token);
 
       window.dispatchEvent(new CustomEvent('localStorageChange', {
         detail: {
@@ -41,3 +40,4 @@ function Callback() {
 }
 
 export default Callback;
+
