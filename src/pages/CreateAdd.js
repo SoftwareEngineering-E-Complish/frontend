@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
-import { useLocation } from 'react-router-dom';
-import { Button, Typography } from '@mui/material';
 import { Box } from '@mui/material';
-import { FormControl, InputLabel, TextField,Select,MenuItem,NativeSelect} from '@mui/material';
+import { FormControl, InputLabel, TextField,Select,MenuItem} from '@mui/material';
 import { useEffect } from 'react';
-import ImageList from '@mui/material/ImageList';
-import ImageListItem from '@mui/material/ImageListItem';
+import { Button, Grid, Typography,IconButton, Paper } from '@mui/material';
+import CloseIcon from '@mui/icons-material/Close';
+import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
+
 
 const useMediaQuery = (query) => {
   const [matches, setMatches] = useState(window.matchMedia(query).matches);
@@ -70,7 +70,9 @@ const itemData = [
   },
 ];
 
-function ProfilePage({ newCreated }) { 
+
+function AddPage({ newCreated }) { 
+
   const [formState, setFormState] = useState({
     adName: '',
     category: '',
@@ -85,9 +87,11 @@ function ProfilePage({ newCreated }) {
     address: '',
     canton: '',
     description: '',
-    images: [],
+    images: [], // provide an initial value of an empty array
   });
-
+  const isSmallScreen = useMediaQuery('(max-width: 600px)');
+  const fieldWidth = isSmallScreen ? '90%' : '45%';
+  const verticalPadding = 2
   useEffect(() => {
     if (newCreated) {
       setFormState({
@@ -107,8 +111,7 @@ function ProfilePage({ newCreated }) {
         images: [],
       });
     } else {
-      // Logic to set form state based on some 'ad' object, assuming 'ad' is available
-      // Replace 'ad' with the actual logic to get the ad details
+      // Replace 'ad' with actual listing
       const ad = {
         adName: 'Example Ad',
         category: 'house',
@@ -122,13 +125,7 @@ function ProfilePage({ newCreated }) {
       });
     }
   }, [newCreated]);
-  const isSmallScreen = useMediaQuery('(max-width: 600px)');
-  const [category, setCategory] = React.useState('Category');
-  const fieldWidth = isSmallScreen ? '90%' : '45%';
-  const imageRows = isSmallScreen ? 1 : 2;
-  const verticalPadding = 2
 
-  
   const handleChangeDropdown = (name, event) => {
     const value = event.target.value;
   
@@ -147,17 +144,40 @@ function ProfilePage({ newCreated }) {
     });
   };
   
-  const handleImageUpload = (event) => {
-    setFormState({
-      ...formState,
-      images: event.target.files,
-    });
-  };
   
   const handleSubmit = (event) => {
     event.preventDefault();
     // Handle form submission here
   };
+  const [images, setImages] = useState([]);
+  const handleFileSelect = (event) => {
+    const files = Array.from(event.target.files);
+    const imageUrls = files.map(file => URL.createObjectURL(file));
+    setImages(prevImages => [...prevImages, ...imageUrls]);
+  };
+  const handleButtonClick = () => {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.multiple = true;
+    input.onchange = handleFileSelect;
+    input.click();
+  };
+
+  const handleDeleteClick = (index) => {
+    setImages(images.filter((_, i) => i !== index));
+  };
+
+  const handleOnDragEnd = (result) => {
+    if (!result.destination) return;
+
+    const items = Array.from(images);
+    const [reorderedItem] = items.splice(result.source.index, 1);
+    items.splice(result.destination.index, 0, reorderedItem);
+
+    setImages(items);
+  };
+  const isFirstImage = (index) => index === 0;
+
   return (
     <form onSubmit={handleSubmit}>
         <Typography variant="h4" align="center" sx={{ mb: 4 ,py:1}}>Create Ad</Typography>
@@ -205,32 +225,72 @@ function ProfilePage({ newCreated }) {
         <TextField label="Address" name="address" onChange={handleChange} sx={{ mb: verticalPadding, width: fieldWidth }}/>
         <TextField label="Canton" name="canton" onChange={handleChange} sx={{ mb: verticalPadding, width: fieldWidth }}/>
         <TextField label="Description" name="description" multiline rows={4} onChange={handleChange} sx={{ mb: verticalPadding, width: fieldWidth }}/>
-        <input type="file" name="images" onChange={handleImageUpload} multiple style={{ display: 'none' }} id="raised-button-file" />
-        <label htmlFor="raised-button-file">
-          <Button variant="raised" component="span">
-            Upload Images
-          </Button>
-        <ImageList sx={{ width: "100%", height: 450 }} cols={imageRows} rowHeight={264}>
-          {itemData.map((item) => (
-            <ImageListItem key={item.img}>
-              <img
-                srcSet={`${item.img}?w=364&h=164&fit=crop&auto=format&dpr=2 2x`}
-                src={`${item.img}?w=164&h=164&fit=crop&auto=format`}
-                alt={item.title}
-                loading="lazy"
-              />
-            </ImageListItem>
-          ))}
-        </ImageList>
 
+        <Button variant="contained" component="label" onClick={handleButtonClick}>
+        Upload Images
+      </Button>
+      <div  sx={{ mb: verticalPadding, width: fieldWidth }}>
+      <DragDropContext onDragEnd={handleOnDragEnd}>
+        <Droppable droppableId="image-grid">
+          {(provided) => (
+            <Grid container spacing={3} ref={provided.innerRef} {...provided.droppableProps}>
+              {images.map((image, index) => (
+                <Draggable key={image} draggableId={image} index={index}>
+                  {(provided) => (
+                    <Grid item xs={4}>
+                      <div ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps}>
+                        <div style={{ position: 'relative' }}>
+                          <Paper style={{ padding: '10px' }}>
+                            <img
+                              src={image}
+                              alt={`Uploaded image ${index}`}
+                              style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                            />
+                            {isFirstImage(index) && (
+                              <div
+                                style={{
+                                  position: 'absolute',
+                                  top: 0,
+                                  left: 0,
+                                  width: '100%',
+                                  height: '100%',
+                                  backgroundColor: 'rgba(0, 0, 0, 0,0)',
+                                  display: 'flex',
+                                  justifyContent: 'center',
+                                  alignItems: 'center',
+                                  color: 'white',
+                                  fontWeight: 'bold',
+                                }}
+                              >
+                                Gallery Image
+                              </div>
+                            )}
+                          </Paper>
+                          <IconButton
+                            aria-label="delete"
+                            size="large"
+                            style={{ position: 'absolute', top: 5, right: 5, zIndex: 999 }}
+                            onClick={() => handleDeleteClick(index)}
+                          >
+                            <CloseIcon fontSize="inherit" />
+                          </IconButton>
+                        </div>
+                      </div>
+                    </Grid>
+                  )}
+                </Draggable>
+              ))}
+              {provided.placeholder}
+            </Grid>
+          )}
+        </Droppable>
+      </DragDropContext>
+      </div>
+        <Button type="submit" variant="contained" sx={{ mt: 7}} color="primary">Publish Listing</Button>
 
-        </label>
-        <Button type="submit" variant="contained" color="primary">Submit</Button>
         </Box>
-
-x
     </form>
   );
 }
 
-export default ProfilePage;
+export default AddPage;
