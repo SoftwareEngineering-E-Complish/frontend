@@ -38,11 +38,12 @@ function AddPage({ newCreated }) {
         bathrooms: '',
         bedrooms: '',
         location: '',
+        year_built: '',
         description: '',
         images: [],
       });
     } else {
-      // Replace 'ad' with actual listing
+      // Replace 'ad' with actual listing i also need to get the images with setimages from hjere
       const ad = {
         adName: 'Example Ad',
         property_type: 'house',
@@ -75,12 +76,6 @@ function AddPage({ newCreated }) {
     });
   };
   
-  const setBlobImages = (imagess) => {
-    setFormState((prevState) => ({
-      ...prevState,
-      images: imagess,
-    }));
-  }
   
   const convertImagesToBlobs = async (images) => {
     const blobPromises = images.map((image) =>
@@ -91,35 +86,33 @@ function AddPage({ newCreated }) {
         })
     );
     const blobImages = await Promise.all(blobPromises);
-    setBlobImages(blobImages);
+    return {
+      ...formState,
+      images: blobImages,
+    };
   };
   
   const handleSubmit = async(event) => {
     event.preventDefault();
-    await convertImagesToBlobs(images);
+    const newState = await convertImagesToBlobs(images);
+    console.log(newState)
     if (newCreated) {
-        try {
-      await axiosInstance.post('/createProperty', {'content': formState});
-      setError('success');
-  } catch (error) {
-      setError('Error creating new ad');
-  }
-
+      try {
+        await axiosInstance.post('/createProperty', {'content': newState});
+        setError('success');
+      } catch (error) {
+        setError('Error creating new ad');
+      }
     }
     else {
       try {
-        await axiosInstance.post('/updateProperty',  {'content': formState});
+        await axiosInstance.post('/updateProperty',  {'content': newState});
         setError('success');
-    } catch (error) {
+      } catch (error) {
         setError('Error updating new ad');
-    }
-
+      }
     }
   };
-
-  useEffect(() => {
-    console.log(formState);
-  }, [formState]);
 
   const handleFileSelect = (event) => {
     const files = Array.from(event.target.files);
@@ -153,7 +146,7 @@ function AddPage({ newCreated }) {
     <form onSubmit={handleSubmit}>
         <Typography variant="h4" align="center" sx={{ mb: 4 ,py:1}}>Create Ad</Typography>
         <Box sx={{ display: 'flex', flexDirection: 'column',alignItems:"center", py:1}}>
-        <TextField label="Ad Name" name="adName" onChange={handleChange} sx={{ mb: verticalPadding, width:fieldWidth, alignContent:'center'}} />
+        <TextField label="title" name="title" onChange={handleChange} sx={{ mb: verticalPadding, width:fieldWidth, alignContent:'center'}} />
         <FormControl sx={{ mb: verticalPadding, width:fieldWidth, alignContent:'center'}}>
         <InputLabel id="select_property_type">property_type</InputLabel>
         <Select
@@ -163,27 +156,15 @@ function AddPage({ newCreated }) {
           label="property_type"
             onChange={(event) => handleChangeDropdown('property_type', event)}
             >
-          <MenuItem value={'house'}>house</MenuItem>
-          <MenuItem value={'appartament'}>appartament</MenuItem>
+          <MenuItem value={'House'}>House</MenuItem>
+          <MenuItem value={'Apartment'}>Apartment</MenuItem>
         </Select>
         </FormControl>
-        <FormControl sx={{ mb: verticalPadding, width:fieldWidth, alignContent:'center'}}>
-        <InputLabel id="demo-simple-select-label">Transaction Type</InputLabel>
-        <Select
-          labelId="demo-simple-select-label"
-          id="demo-simple-select"
-          value={formState.transactionType}
-          label=" transactionType"
-          onChange={(event) => handleChangeDropdown('transactionType', event)}
-        >
-          <MenuItem value={'sell'}>rent</MenuItem>
-          <MenuItem value={'rent'}>sell</MenuItem>
-        </Select>
-        </FormControl>
-        <TextField  label="Price in sfr" name="price"  onChange={handleChange} sx={{ mb: verticalPadding, width: fieldWidth }}/>
+        <TextField  label="Price in sfr" name="price" type="number" onChange={handleChange} sx={{ mb: verticalPadding, width: fieldWidth }}/>
         <TextField  label="Surface in m2" name="square_meters"  type="number" onChange={handleChange} sx={{ mb: verticalPadding, width: fieldWidth }}/>
         <TextField label="Number of Rooms" name="rooms" type="number" onChange={handleChange} sx={{ mb: verticalPadding, width: fieldWidth }}/>
-        <TextField label="Number of Bathrooms" name="bathrooms" type="number" onChange={handleChange} sx={{ mb: verticalPadding, width: fieldWidth }}/>
+        <TextField label="Number of Rooms" name="" type="number" onChange={handleChange} sx={{ mb: verticalPadding, width: fieldWidth }}/>
+        <TextField label="Construction year" name="year_built" type="number" onChange={handleChange} sx={{ mb: verticalPadding, width: fieldWidth }}/>
         <TextField label="Number of Bedrooms" name="bedrooms" type="number" onChange={handleChange} sx={{ mb: verticalPadding, width: fieldWidth }}/>
         <TextField label="location" name="address" onChange={handleChange} sx={{ mb: verticalPadding, width: fieldWidth }}/>
         <TextField label="Description" name="description" multiline rows={4} onChange={handleChange} sx={{ mb: verticalPadding, width: fieldWidth }}/>

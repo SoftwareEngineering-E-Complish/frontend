@@ -12,6 +12,9 @@ import {ProfileGuard} from "../routeProtectors/ProfileGuard.js";
 
 
 const AppRouter = () => {
+  //        <Route path="/createAdd" element={<ProfileGuard />}>
+  //<Route path="/createAdd" element = {<AddPage newCreated={true}/>}>
+  //</Route>
   return (
       <Routes>
         <Route path="/properties" element={<ProductList />}>
@@ -25,9 +28,9 @@ const AppRouter = () => {
         <Route path="/profile" element={<ProfileGuard />}>
             <Route path="/profile" element = {<Profile />}/>
         </Route>
-        <Route path="/createAdd" element={<ProfileGuard />}>
+
           <Route path="/createAdd" element = {<AddPage newCreated={true}/>}>
-        </Route>
+
         </Route>
         <Route path="/" element = {<Landing />}>
         </Route>
