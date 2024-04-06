@@ -21,28 +21,23 @@ const useMediaQuery = (query) => {
 };
 
 function AddPage({ newCreated }) { 
-
   const [formState, setFormState] = useState({});
   const [images, setImages] = useState([]);
   const [error, setError] = useState('');
   const isSmallScreen = useMediaQuery('(max-width: 600px)');
   const fieldWidth = isSmallScreen ? '90%' : '45%';
   const verticalPadding = 2
+
   useEffect(() => {
     if (newCreated) {
       setFormState({
-        adName: '',
-        category: '',
-        transactionType: '',
+        title: '',
+        property_type: '',
         price: '',
-        surface: '',
-        rooms: '',
+        square_meters: '',
         bathrooms: '',
         bedrooms: '',
-        city: '',
-        zip_code: '',
-        address: '',
-        canton: '',
+        location: '',
         description: '',
         images: [],
       });
@@ -50,7 +45,7 @@ function AddPage({ newCreated }) {
       // Replace 'ad' with actual listing
       const ad = {
         adName: 'Example Ad',
-        category: 'house',
+        property_type: 'house',
         transactionType: 'sell',
         price: '100000',
         // Rest of the properties
@@ -104,7 +99,7 @@ function AddPage({ newCreated }) {
     await convertImagesToBlobs(images);
     if (newCreated) {
         try {
-      await axiosInstance.post('/createAdd', formState);
+      await axiosInstance.post('/createProperty', {'content': formState});
       setError('success');
   } catch (error) {
       setError('Error creating new ad');
@@ -113,7 +108,7 @@ function AddPage({ newCreated }) {
     }
     else {
       try {
-        await axiosInstance.post('/updateAdd', formState);
+        await axiosInstance.post('/updateProperty',  {'content': formState});
         setError('success');
     } catch (error) {
         setError('Error updating new ad');
@@ -160,22 +155,16 @@ function AddPage({ newCreated }) {
         <Box sx={{ display: 'flex', flexDirection: 'column',alignItems:"center", py:1}}>
         <TextField label="Ad Name" name="adName" onChange={handleChange} sx={{ mb: verticalPadding, width:fieldWidth, alignContent:'center'}} />
         <FormControl sx={{ mb: verticalPadding, width:fieldWidth, alignContent:'center'}}>
-        <InputLabel id="select_category">Category</InputLabel>
+        <InputLabel id="select_property_type">property_type</InputLabel>
         <Select
-          labelId="select_category-label"
-          id="select_category-select"
-          value={formState.category}
-          label="category"
-            onChange={(event) => handleChangeDropdown('category', event)}
+          labelId="select_property_type-label"
+          id="select_property_type-select"
+          value={formState.property_type}
+          label="property_type"
+            onChange={(event) => handleChangeDropdown('property_type', event)}
             >
           <MenuItem value={'house'}>house</MenuItem>
           <MenuItem value={'appartament'}>appartament</MenuItem>
-          <MenuItem value={'office'}>office</MenuItem>
-          <MenuItem value={'commercial'}>commercial</MenuItem>
-          <MenuItem value={'industrial'}>industrial</MenuItem>
-          <MenuItem value={'land'}>land</MenuItem>
-          <MenuItem value={'garage'}>garage</MenuItem>
-          <MenuItem value={'other'}>other</MenuItem>
         </Select>
         </FormControl>
         <FormControl sx={{ mb: verticalPadding, width:fieldWidth, alignContent:'center'}}>
@@ -191,15 +180,12 @@ function AddPage({ newCreated }) {
           <MenuItem value={'rent'}>sell</MenuItem>
         </Select>
         </FormControl>
-        <TextField  label="Price in sfr" name="price" type="number" onChange={handleChange} sx={{ mb: verticalPadding, width: fieldWidth }}/>
-        <TextField  label="Surface in m2" name="surface"  type="number" onChange={handleChange} sx={{ mb: verticalPadding, width: fieldWidth }}/>
+        <TextField  label="Price in sfr" name="price"  onChange={handleChange} sx={{ mb: verticalPadding, width: fieldWidth }}/>
+        <TextField  label="Surface in m2" name="square_meters"  type="number" onChange={handleChange} sx={{ mb: verticalPadding, width: fieldWidth }}/>
         <TextField label="Number of Rooms" name="rooms" type="number" onChange={handleChange} sx={{ mb: verticalPadding, width: fieldWidth }}/>
         <TextField label="Number of Bathrooms" name="bathrooms" type="number" onChange={handleChange} sx={{ mb: verticalPadding, width: fieldWidth }}/>
         <TextField label="Number of Bedrooms" name="bedrooms" type="number" onChange={handleChange} sx={{ mb: verticalPadding, width: fieldWidth }}/>
-        <TextField label="City" name="city" onChange={handleChange} sx={{ mb: verticalPadding, width: fieldWidth }}/>
-        <TextField label="Postalcode" name="zip_code" onChange={handleChange} sx={{ mb: verticalPadding, width: fieldWidth }}/>
-        <TextField label="Address" name="address" onChange={handleChange} sx={{ mb: verticalPadding, width: fieldWidth }}/>
-        <TextField label="Canton" name="canton" onChange={handleChange} sx={{ mb: verticalPadding, width: fieldWidth }}/>
+        <TextField label="location" name="address" onChange={handleChange} sx={{ mb: verticalPadding, width: fieldWidth }}/>
         <TextField label="Description" name="description" multiline rows={4} onChange={handleChange} sx={{ mb: verticalPadding, width: fieldWidth }}/>
 
         <Button variant="contained" component="label" onClick={handleButtonClick}>

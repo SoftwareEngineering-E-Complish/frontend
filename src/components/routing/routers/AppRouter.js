@@ -25,7 +25,9 @@ const AppRouter = () => {
         <Route path="/profile" element={<ProfileGuard />}>
             <Route path="/profile" element = {<Profile />}/>
         </Route>
-        <Route path="/createAdd" element = {<AddPage newCreated={true}/>}>
+        <Route path="/profile" element={<ProfileGuard />}>
+          <Route path="/createAdd" element = {<AddPage newCreated={true}/>}>
+        </Route>
         </Route>
         <Route path="/" element = {<Landing />}>
         </Route>
