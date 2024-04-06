@@ -6,7 +6,7 @@ import ProductList from "../../../products/ProductList";
 import Login from "../../../pages/Login";
 import Register from "../../../pages/Register";
 import Profile from "../../../pages/Profile";
-import CreateAdd from "../../../pages/CreateAdd";
+import AddPage from "../../../pages/CreateAdd";
 import Callback from "../../../pages/Callback";
 import {ProfileGuard} from "../routeProtectors/ProfileGuard.js";
 
@@ -25,7 +25,7 @@ const AppRouter = () => {
         <Route path="/profile" element={<ProfileGuard />}>
             <Route path="/profile" element = {<Profile />}/>
         </Route>
-        <Route path="/createAdd" element = {<CreateAdd />}>
+        <Route path="/createAdd" element = {<AddPage newCreated={true}/>}>
         </Route>
         <Route path="/" element = {<Landing />}>
         </Route>

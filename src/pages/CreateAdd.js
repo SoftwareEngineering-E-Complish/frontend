@@ -5,6 +5,7 @@ import { useEffect } from 'react';
 import { Button, Grid, Typography,IconButton, Paper } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
+import axiosInstance from '../api/axiosInstance';
 
 
 const useMediaQuery = (query) => {
@@ -19,76 +20,11 @@ const useMediaQuery = (query) => {
   return matches;
 };
 
-const itemData = [
-  {
-    img: 'https://images.unsplash.com/photo-1551963831-b3b1ca40c98e',
-    title: 'Breakfast',
-  },
-  {
-    img: 'https://images.unsplash.com/photo-1551782450-a2132b4ba21d',
-    title: 'Burger',
-  },
-  {
-    img: 'https://images.unsplash.com/photo-1522770179533-24471fcdba45',
-    title: 'Camera',
-  },
-  {
-    img: 'https://images.unsplash.com/photo-1444418776041-9c7e33cc5a9c',
-    title: 'Coffee',
-  },
-  {
-    img: 'https://images.unsplash.com/photo-1533827432537-70133748f5c8',
-    title: 'Hats',
-  },
-  {
-    img: 'https://images.unsplash.com/photo-1558642452-9d2a7deb7f62',
-    title: 'Honey',
-  },
-  {
-    img: 'https://images.unsplash.com/photo-1516802273409-68526ee1bdd6',
-    title: 'Basketball',
-  },
-  {
-    img: 'https://images.unsplash.com/photo-1518756131217-31eb79b20e8f',
-    title: 'Fern',
-  },
-  {
-    img: 'https://images.unsplash.com/photo-1597645587822-e99fa5d45d25',
-    title: 'Mushrooms',
-  },
-  {
-    img: 'https://images.unsplash.com/photo-1567306301408-9b74779a11af',
-    title: 'Tomato basil',
-  },
-  {
-    img: 'https://images.unsplash.com/photo-1471357674240-e1a485acb3e1',
-    title: 'Sea star',
-  },
-  {
-    img: 'https://images.unsplash.com/photo-1589118949245-7d38baf380d6',
-    title: 'Bike',
-  },
-];
-
-
 function AddPage({ newCreated }) { 
 
-  const [formState, setFormState] = useState({
-    adName: '',
-    category: '',
-    transactionType: '',
-    price: '',
-    surface: '',
-    rooms: '',
-    bathrooms: '',
-    bedrooms: '',
-    city: '',
-    zip_code: '',
-    address: '',
-    canton: '',
-    description: '',
-    images: [], // provide an initial value of an empty array
-  });
+  const [formState, setFormState] = useState({});
+  const [images, setImages] = useState([]);
+  const [error, setError] = useState('');
   const isSmallScreen = useMediaQuery('(max-width: 600px)');
   const fieldWidth = isSmallScreen ? '90%' : '45%';
   const verticalPadding = 2
@@ -144,17 +80,58 @@ function AddPage({ newCreated }) {
     });
   };
   
+  const setBlobImages = (imagess) => {
+    setFormState((prevState) => ({
+      ...prevState,
+      images: imagess,
+    }));
+  }
   
-  const handleSubmit = (event) => {
-    event.preventDefault();
-    // Handle form submission here
+  const convertImagesToBlobs = async (images) => {
+    const blobPromises = images.map((image) =>
+      fetch(image)
+        .then((res) => res.blob())
+        .then((blob) => {
+          return blob;
+        })
+    );
+    const blobImages = await Promise.all(blobPromises);
+    setBlobImages(blobImages);
   };
-  const [images, setImages] = useState([]);
+  
+  const handleSubmit = async(event) => {
+    event.preventDefault();
+    await convertImagesToBlobs(images);
+    if (newCreated) {
+        try {
+      await axiosInstance.post('/createAdd', formState);
+      setError('success');
+  } catch (error) {
+      setError('Error creating new ad');
+  }
+
+    }
+    else {
+      try {
+        await axiosInstance.post('/updateAdd', formState);
+        setError('success');
+    } catch (error) {
+        setError('Error updating new ad');
+    }
+
+    }
+  };
+
+  useEffect(() => {
+    console.log(formState);
+  }, [formState]);
+
   const handleFileSelect = (event) => {
     const files = Array.from(event.target.files);
     const imageUrls = files.map(file => URL.createObjectURL(file));
     setImages(prevImages => [...prevImages, ...imageUrls]);
   };
+
   const handleButtonClick = () => {
     const input = document.createElement('input');
     input.type = 'file';
@@ -169,13 +146,12 @@ function AddPage({ newCreated }) {
 
   const handleOnDragEnd = (result) => {
     if (!result.destination) return;
-
     const items = Array.from(images);
     const [reorderedItem] = items.splice(result.source.index, 1);
     items.splice(result.destination.index, 0, reorderedItem);
-
     setImages(items);
   };
+
   const isFirstImage = (index) => index === 0;
 
   return (
@@ -240,7 +216,7 @@ function AddPage({ newCreated }) {
                     <Grid item xs={4}>
                       <div ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps}>
                         <div style={{ position: 'relative' }}>
-                          <Paper style={{ padding: '10px' }}>
+                          <Paper style={{ padding: '10px',height: '200px' }}>
                             <img
                               src={image}
                               alt={`Uploaded image ${index}`}
@@ -286,9 +262,13 @@ function AddPage({ newCreated }) {
         </Droppable>
       </DragDropContext>
       </div>
-        <Button type="submit" variant="contained" sx={{ mt: 7}} color="primary">Publish Listing</Button>
-
+        <Button type="submit" variant="contained" sx={{ mt: 7}} color="primary" onClick={handleSubmit}>Publish Listing</Button>
         </Box>
+        {error && (
+        <Box sx={{ mt: 2 }}>
+          <Typography color="error">{error}</Typography>
+        </Box>
+      )}
     </form>
   );
 }
