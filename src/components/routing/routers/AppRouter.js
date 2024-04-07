@@ -25,7 +25,7 @@ const AppRouter = () => {
         </Route>
         <Route path="/register" element = {<Register />}>
         </Route>
-        <Route path="/profile" element={<ProfileGuard />}>
+        <Route path="/profile" element={<LoggedInGuard />}>
             <Route path="/profile" element = {<Profile />}/>
         </Route>
           <Route path="/createAdd" element = {<AddPage newCreated={true}/>}>
