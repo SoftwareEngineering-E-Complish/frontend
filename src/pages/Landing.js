@@ -16,7 +16,7 @@ function NewLandingPage() {
       const response = await axiosInstance.get("/initial_query", {
         params: { user_query: userInput }
       });
-      const searchResults = response.data;
+      const searchResults = response.data.entries;
       console.log(searchResults, "results");
 
       setSearchResults(searchResults);
