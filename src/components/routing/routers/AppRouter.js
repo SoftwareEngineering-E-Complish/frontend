@@ -1,5 +1,5 @@
 import React from "react";
-import {BrowserRouter, Route, Routes} from "react-router-dom";
+import { BrowserRouter, Route, Routes } from "react-router-dom";
 import ProductDetail from "../../../products/detail/ProductDetail";
 import Landing from "../../../pages/Landing.js";
 import ProductList from "../../../products/ProductList";
@@ -8,7 +8,7 @@ import Register from "../../../pages/Register";
 import Profile from "../../../pages/Profile";
 import AddPage from "../../../pages/CreateAdd";
 import Callback from "../../../pages/Callback";
-import {ProfileGuard} from "../routeProtectors/ProfileGuard.js";
+import { LoggedInGuard } from "../routeProtectors/ProfileGuard.js";
 
 
 const AppRouter = () => {
@@ -28,9 +28,7 @@ const AppRouter = () => {
         <Route path="/profile" element={<ProfileGuard />}>
             <Route path="/profile" element = {<Profile />}/>
         </Route>
-
           <Route path="/createAdd" element = {<AddPage newCreated={true}/>}>
-
         </Route>
         <Route path="/" element = {<Landing />}>
         </Route>
