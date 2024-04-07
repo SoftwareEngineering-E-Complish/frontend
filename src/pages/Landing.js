@@ -13,7 +13,7 @@ function NewLandingPage() {
   const search = async () => {
 
     try {
-      const response = await axiosInstance.get("/properties", {
+      const response = await axiosInstance.get("/initial_query", {
         params: { user_query: userInput }
       });
       const searchResults = response.data;
