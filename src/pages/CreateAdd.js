@@ -95,13 +95,22 @@ function AddPage({ newCreated }) {
   const handleSubmit = async(event) => {
     event.preventDefault();
     const newState = await convertImagesToBlobs(images);
-    console.log(newState)
+    console.log(newState);
     if (newCreated) {
       try {
-        await axiosInstance.post('/createProperty', {'content': newState});
-        setError('success');
+      const formData = new FormData();
+      formData.append('content', JSON.stringify(newState));
+      for (let i = 0; i < newState.images.length; i++) {
+        formData.append('images', newState.images[i]);
+      }
+      await axiosInstance.post('/createProperty', formData, {
+        headers: {
+        'Content-Type': 'multipart/form-data',
+        },
+      });
+      setError('success');
       } catch (error) {
-        setError('Error creating new ad');
+      setError('Error creating new ad');
       }
     }
     else {
