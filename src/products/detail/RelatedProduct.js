@@ -9,7 +9,7 @@ function RelatedProduct(props) {
   let { id } = useParams();
   console.log("id" + id);
   const { searchResults } = useSearch();
-  const property = searchResults.find(p => p.propertyId === id);
+  const property = searchResults.find(p => p.propertyId === Number(id));
   const image = housesData[3].image;
   
     

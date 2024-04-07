@@ -11,7 +11,14 @@ const iconPath =
 function ProductDetail() {
   let { id } = useParams();
   const { searchResults } = useSearch();
-  const property = searchResults.find(p => p.propertyId === id);
+  const property = searchResults.find(p => p.propertyId === Number(id));
+// Loop through each item in the searchResults to log its propertyId value and type
+  searchResults.forEach(p => console.log(`Value: ${p.propertyId}, Type: ${typeof p.propertyId}`));
+
+// Log the target id value and its type
+  console.log(`Target ID: Value: ${id}, Type: ${typeof id}`);
+
+
   //const location = useLocation();
   //const { property } = location.state || {};
   //const property = housesData.find(house => house.propertyId === Number(id));
