@@ -1,19 +1,30 @@
 import RelatedProduct from "./RelatedProduct";
 import Ratings from "react-ratings-declarative";
-import { Link, useParams } from "react-router-dom";
+import { Link, useParams , useLocation} from "react-router-dom";
 import ScrollToTopOnMount from "../../template/ScrollToTopOnMount";
 import { housesData } from'../../mockdata';
+import { useSearch } from '../../SearchContext';
 
 const iconPath =
   "M18.571 7.221c0 0.201-0.145 0.391-0.29 0.536l-4.051 3.951 0.96 5.58c0.011 0.078 0.011 0.145 0.011 0.223 0 0.29-0.134 0.558-0.458 0.558-0.156 0-0.313-0.056-0.446-0.134l-5.011-2.634-5.011 2.634c-0.145 0.078-0.29 0.134-0.446 0.134-0.324 0-0.469-0.268-0.469-0.558 0-0.078 0.011-0.145 0.022-0.223l0.96-5.58-4.063-3.951c-0.134-0.145-0.279-0.335-0.279-0.536 0-0.335 0.346-0.469 0.625-0.513l5.603-0.815 2.511-5.078c0.1-0.212 0.29-0.458 0.547-0.458s0.446 0.246 0.547 0.458l2.511 5.078 5.603 0.815c0.268 0.045 0.625 0.179 0.625 0.513z";
 
 function ProductDetail() {
   let { id } = useParams();
-  console.log("id" + id);
-  const property = housesData.find(house => house.id === Number(id));
-  const agent = property.agent;
+  const { searchResults } = useSearch();
+  const property = searchResults.find(p => p.propertyId === Number(id));
+// Loop through each item in the searchResults to log its propertyId value and type
+  searchResults.forEach(p => console.log(`Value: ${p.propertyId}, Type: ${typeof p.propertyId}`));
 
-  function changeRating(newRating) {}
+// Log the target id value and its type
+  console.log(`Target ID: Value: ${id}, Type: ${typeof id}`);
+
+
+  //const location = useLocation();
+  //const { property } = location.state || {};
+  //const property = housesData.find(house => house.propertyId === Number(id));
+  const agent = housesData[0].agent;
+  const image = housesData[1].imageLg;
+
   return (
     <div className="container mt-5 py-4 px-xl-5">
       <ScrollToTopOnMount/>
@@ -30,7 +41,7 @@ function ProductDetail() {
             </a>
           </li>
           <li className="breadcrumb-item active" aria-current="page">
-            {property.name}
+            {property.title}
           </li>
         </ol>
       </nav>
@@ -45,7 +56,7 @@ function ProductDetail() {
                     <img
                       className={"rounded mb-2 ratio " + selected}
                       alt=""
-                      src={property.imageLg}
+                      src={image}
                     />
                   </a>
                 );
@@ -59,7 +70,7 @@ function ProductDetail() {
               <img
                 className="border rounded ratio ratio-1x1"
                 alt=""
-                src={property.imageLg}
+                src={image}
               />
             </div>
           </div>
@@ -69,7 +80,7 @@ function ProductDetail() {
 
         <div className="col-lg-5">
           <div className="d-flex flex-column h-100">
-            <h2 className="mb-1">{property.name}</h2>
+            <h2 className="mb-1">{property.title}</h2>
             <h4 className="text-muted mb-4">{property.price} $</h4>
 
             <div className="row g-3 mb-4">
@@ -87,16 +98,16 @@ function ProductDetail() {
             <hr />
             <dl className="row">
               <dt className="col-sm-4">Type</dt>
-              <dd className="col-sm-8 mb-3">{property.type}</dd>
+              <dd className="col-sm-8 mb-3">{property.property_type}</dd>
 
               <dt className="col-sm-4">Owner</dt>
-              <dd className="col-sm-8 mb-3">{property.agent.name}</dd>
+              <dd className="col-sm-8 mb-3">owner name</dd>
 
               <dt className="col-sm-4">Constructed in</dt>
-              <dd className="col-sm-8 mb-3">{property.year}</dd>
+              <dd className="col-sm-8 mb-3">{property.year_built}</dd>
 
               <dt className="col-sm-4">Location</dt>
-              <dd className="col-sm-8 mb-3">{property.country}</dd>
+              <dd className="col-sm-8 mb-3">{property.location}</dd>
 
               <dt className="col-sm-4">Bedrooms</dt>
               <dd className="col-sm-8 mb-3">{property.bedrooms}</dd>
@@ -105,14 +116,14 @@ function ProductDetail() {
               <dd className="col-sm-8 mb-3">{property.bathrooms}</dd>
 
               <dt className="col-sm-4">Surface</dt>
-              <dd className="col-sm-8 mb-3">{property.surface}</dd>
+              <dd className="col-sm-8 mb-3">{property.square_meters}</dd>
 
               <dt className="col-sm-4">Seller Rating</dt>
               <dd className="col-sm-8 mb-3">
                 <Ratings
                   rating={4.5}
                   widgetRatedColors="rgb(253, 204, 13)"
-                  changeRating={changeRating}
+                  //changeRating={changeRating}
                   widgetSpacings="2px"
                 >
                   {Array.from({ length: 5 }, (_, i) => {

@@ -1,10 +1,13 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Link } from "react-router-dom";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import axiosInstance from "../api/axiosInstance";
 
 function Header() {
 
   const [openedDrawer, setOpenedDrawer] = useState(false)
+  const [loggedIn, setLoggedIn] = useState(false);
+  let profileField = (<div></div>);
 
   function toggleDrawer() {
     setOpenedDrawer(!openedDrawer);
@@ -15,7 +18,82 @@ function Header() {
       setOpenedDrawer(false)
     }
   }
+  const handleRegister = async (event) => {
+    event.preventDefault();
+    try {
+      const response = await axiosInstance.get("/signupURL");
+      console.log("Signup URL: " + response.data);
 
+      //setSearchResults(searchResults); // Set search results in global state
+      window.location.replace(response.data);
+    } catch (error) {
+
+    }
+  };
+
+  const handleLogin = async (event) => {
+    event.preventDefault();
+    try {
+      const response = await axiosInstance.get("/loginURL");
+      console.log("Login URL: " + response.data);
+      //setSearchResults(searchResults); // Set search results in global state
+      window.location.replace(response.data);
+    } catch (error) {
+
+    }
+  };
+
+  profileField = loggedIn ? (
+    <li className="nav-item">
+      <Link to="/profile" className="nav-link">
+        <FontAwesomeIcon icon={["fas", "user-alt"]} />
+      </Link>
+    </li>
+  ) : (
+    <li className="nav-item dropdown">
+      <a
+        href="#!"
+        className="nav-link dropdown-toggle"
+        id="userDropdown"
+        role="button"
+        data-bs-toggle="dropdown"
+        aria-expanded="false"
+      >
+        <FontAwesomeIcon icon={["fas", "user-alt"]} />
+      </a>
+      <ul className="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+        <li>
+          <Link to="#" className="dropdown-item" onClick={handleLogin}>
+            Login
+          </Link>
+        </li>
+        <li>
+          <Link to="#" className="dropdown-item" onClick={handleRegister}>
+            Sign Up
+          </Link>
+        </li>
+      </ul>
+    </li>
+  );
+
+  useEffect(() => {
+    const checkToken = () => {
+      const token = localStorage.getItem('accessToken');
+      console.log(token);
+      setLoggedIn(!!token);
+    };
+    checkToken();
+    const handleStorageChange = (event) => {
+      console.log("Local Storage Change Detected:", event.detail);
+      checkToken();
+    };
+
+    window.addEventListener('localStorageChange', handleStorageChange);
+    return () => window.removeEventListener('localStorageChange', handleStorageChange);
+
+  }, []);
+
+  console.log("logged in: " + loggedIn);
   return (
     <header>
       <nav className="navbar fixed-top navbar-expand-lg navbar-light bg-white border-bottom ">
@@ -28,7 +106,9 @@ function Header() {
             />
             <span className="ms-2 h5">BinaRentalApp</span>
           </Link>
-
+          <Link className="navbar-brand" to="/createAdd" onClick={changeNav}>
+            <span className="ms-2 h7">Create New Add</span>
+          </Link>
           <div className={"navbar-collapse offcanvas-collapse " + (openedDrawer ? 'open' : '')}>
             <ul className="navbar-nav me-auto mb-lg-0">
               <li className="nav-item">
@@ -38,45 +118,8 @@ function Header() {
               </li>
             </ul>
             <ul className="navbar-nav mb-2 mb-lg-0">
-              <li className="nav-item dropdown">
-                <a
-                  href="!#"
-                  className="nav-link dropdown-toggle"
-                  data-toggle="dropdown"
-                  id="userDropdown"
-                  role="button"
-                  data-bs-toggle="dropdown"
-                  aria-expanded="false"
-                >
-                  <FontAwesomeIcon icon={["fas", "user-alt"]} />
-                </a>
-                <ul
-                  className="dropdown-menu dropdown-menu-end"
-                  aria-labelledby="userDropdown"
-                >
-                  <li>
-                    <Link to="/login" className="dropdown-item" onClick={changeNav}>
-                      Login
-                    </Link>
-                  </li>
-                  <li>
-                    <Link to="/register" className="dropdown-item" onClick={changeNav}>
-                      Sign Up
-                    </Link>
-                  </li>
-                </ul>
-              </li>
+              {profileField}
             </ul>
-          </div>
-
-          <div className="d-inline-block d-lg-none">
-            <button type="button" className="btn btn-outline-dark">
-              <FontAwesomeIcon icon={["fas", "shopping-cart"]} />
-              <span className="ms-3 badge rounded-pill bg-dark">0</span>
-            </button>
-            <button className="navbar-toggler p-0 border-0 ms-3" type="button" onClick={toggleDrawer}>
-              <span className="navbar-toggler-icon"></span>
-            </button>
           </div>
         </div>
       </nav>
