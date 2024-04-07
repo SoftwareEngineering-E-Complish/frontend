@@ -148,7 +148,7 @@ function AddPage({ newCreated }) {
         <Box sx={{ display: 'flex', flexDirection: 'column',alignItems:"center", py:1}}>
         <TextField label="title" name="title" onChange={handleChange} sx={{ mb: verticalPadding, width:fieldWidth, alignContent:'center'}} />
         <FormControl sx={{ mb: verticalPadding, width:fieldWidth, alignContent:'center'}}>
-        <InputLabel id="select_property_type">property_type</InputLabel>
+        <InputLabel id="select_property_type">Type of property</InputLabel>
         <Select
           labelId="select_property_type-label"
           id="select_property_type-select"
@@ -162,9 +162,8 @@ function AddPage({ newCreated }) {
         </FormControl>
         <TextField  label="Price in sfr" name="price" type="number" onChange={handleChange} sx={{ mb: verticalPadding, width: fieldWidth }}/>
         <TextField  label="Surface in m2" name="square_meters"  type="number" onChange={handleChange} sx={{ mb: verticalPadding, width: fieldWidth }}/>
-        <TextField label="Number of Rooms" name="rooms" type="number" onChange={handleChange} sx={{ mb: verticalPadding, width: fieldWidth }}/>
-        <TextField label="Number of Rooms" name="" type="number" onChange={handleChange} sx={{ mb: verticalPadding, width: fieldWidth }}/>
         <TextField label="Construction year" name="year_built" type="number" onChange={handleChange} sx={{ mb: verticalPadding, width: fieldWidth }}/>
+        <TextField label="Number of Bathrooms" name="bathrooms" type="number" onChange={handleChange} sx={{ mb: verticalPadding, width: fieldWidth }}/>
         <TextField label="Number of Bedrooms" name="bedrooms" type="number" onChange={handleChange} sx={{ mb: verticalPadding, width: fieldWidth }}/>
         <TextField label="location" name="address" onChange={handleChange} sx={{ mb: verticalPadding, width: fieldWidth }}/>
         <TextField label="Description" name="description" multiline rows={4} onChange={handleChange} sx={{ mb: verticalPadding, width: fieldWidth }}/>
