@@ -12,9 +12,7 @@ import { LoggedInGuard } from "../routeProtectors/ProfileGuard.js";
 
 
 const AppRouter = () => {
-  //        <Route path="/createAdd" element={<ProfileGuard />}>
-  //<Route path="/createAdd" element = {<AddPage newCreated={true}/>}>
-  //</Route>
+
   return (
       <Routes>
         <Route path="/properties" element={<ProductList />}>
