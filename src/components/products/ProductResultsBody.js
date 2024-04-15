@@ -9,45 +9,26 @@ import mapFormValuesToQueryParams from '../helpers/mapFormValuesToQueryParams';
 import { GoogleMap, LoadScript, Marker } from '@react-google-maps/api';
 
 
-function ProductResultsBody({ products }) {
+function ProductResultsBody({ properties }) {
     const { handleInputChange, queryInfo, setSearchResults, setQueryInfo, formValues } = useSearch();
     const [viewType, setViewType] = useState({ grid: true });
     const [showMapView, setShowMapView] = useState(false);
-    const [center, setCenter] = useState({ lat: 47.3769, lng: 8.5417 });
     const currentPage = queryInfo.offset / queryInfo.limit + 1;
     const totalPages = Math.ceil(queryInfo.total / queryInfo.limit);
     const [map, setMap] = useState(null);
     const navigate = useNavigate();
 
     const points = useMemo(() => {
-        return products.map((product) => product.coordinates ?? center);
-    }, [products]);
-
-    useEffect(() => {
-        if (points.length > 0) {
-            const totalPoints = points.length;
-            let totalLat = 0;
-            let totalLng = 0;
-
-            points.forEach((point) => {
-                totalLat += point.lat;
-                totalLng += point.lng;
-            });
-
-            const avgLat = totalLat / totalPoints;
-            const avgLng = totalLng / totalPoints;
-
-            setCenter({ lat: avgLat, lng: avgLng });
-        }
-    }, [points]);
+        return properties?.map((property) => ({ lat: property.latitude, lng: property.longitude })) ?? [];
+    }, [properties]);
 
     const onLoad = useCallback(function callback(map) {
-        // This is just an example of getting and using the map instance!!! don't just blindly copy!
-        const bounds = new window.google.maps.LatLngBounds(center);
+        const bounds = new window.google.maps.LatLngBounds();
+        points.forEach(point => bounds.extend(point));
         map.fitBounds(bounds);
 
-        setMap(map)
-    }, [])
+        setMap(map);
+    }, [points]);
 
     const onUnmount = useCallback(function callback(map) {
         setMap(null)
@@ -77,7 +58,7 @@ function ProductResultsBody({ products }) {
     function toggleMapView() {
         setShowMapView(!showMapView);
     }
-    if (!products || products.length == 0) return <div className="spinner text-center">No properties found</div>;
+    if (!properties || properties.length == 0) return <div className="spinner text-center">No properties found</div>;
     return (
         <div className="d-flex flex-column h-100">
             <div className="row mb-3">
@@ -108,7 +89,7 @@ function ProductResultsBody({ products }) {
                         <input
                             className="form-control"
                             type="text"
-                            placeholder="Search products..."
+                            placeholder="Search properties..."
                             aria-label="search input"
                         />
                         <button className="btn btn-outline-dark">
@@ -139,24 +120,22 @@ function ProductResultsBody({ products }) {
                                     minHeight: '100%',
                                     maxHeight: 'none'
                                 }}
-                                center={center}
-                                zoom={12}
                                 onLoad={onLoad}
                                 onUnmount={onUnmount}
                             >
-                                {products.map((product, i) => {
+                                {properties.map((property, i) => {
                                     return (<Marker
-                                        key={product.propertyId}
-                                        position={product.coordinates ?? center}
+                                        key={property.propertyId}
+                                        position={{ lat: property.latitude, lng: property.longitude }}
                                         onClick={() => navigate({
-                                            pathname: `/properties/${product.propertyId}`,
-                                            state: { property: product }
+                                            pathname: `/properties/${property.propertyId}`,
+                                            state: { property: property }
                                         })}
                                         icon={{
                                             url: require("../../assets/icon/home.png"),
                                             labelOrigin: { x: 0, y: 40 },
                                         }}
-                                        label={product.title}
+                                        label={property.title}
                                     />);
                                 })}
                             </GoogleMap>
@@ -170,14 +149,14 @@ function ProductResultsBody({ products }) {
                         (viewType.grid ? "row-cols-xl-3" : "row-cols-xl-2")
                     }
                 >
-                    {products.map((product, i) => {
+                    {properties.map((property, i) => {
                         if (viewType.grid) {
                             return (
-                                <Product key={product.propertyId} product={product} />
+                                <Product key={property.propertyId} product={property} />
                             );
                         }
                         return (
-                            <ProductH key={product.propertyId} product={product} />
+                            <ProductH key={property.propertyId} product={property} />
                         );
                     })}
                 </div>)

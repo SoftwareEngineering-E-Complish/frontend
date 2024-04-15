@@ -14,7 +14,6 @@ export const LoggedInGuard = () => {
             try {
                 let accessToken = localStorage.getItem("accessToken");
                 if (!accessToken || accessToken === "undefined") {
-                    sendToLogin = true;
                     throw new Error("Access token not found");
                 } else {
                     const response = await axiosInstance.get("/verifyAccessToken", { params: { accessToken: accessToken } });
@@ -25,7 +24,6 @@ export const LoggedInGuard = () => {
                         } else {
                             const response = await axiosInstance.get("/refreshAccessToken", { params: { refreshToken: refreshToken } });
                             if (response.data === false) {
-                                sendToLogin = true;
                                 throw new Error("Refresh token not found");
                             } else {
                                 localStorage.setItem("accessToken", response.data.accessToken);
@@ -36,11 +34,12 @@ export const LoggedInGuard = () => {
                 }
             } catch (error) {
                 console.log(error);
+                sendToLogin = true;
             } finally {
                 setIsLoading(false);
                 if (sendToLogin) {
                     const response = await axiosInstance.get("/loginURL");
-                    window.location.href = response.data;
+                    window.location.replace(response.data);
                 }
             }
         };

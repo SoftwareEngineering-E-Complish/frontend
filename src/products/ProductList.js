@@ -65,7 +65,7 @@ function ProductList() {
           </div>
         </div>
         <div className="col-lg-9">
-          <ProductResultsBody products={searchResults} />
+          <ProductResultsBody properties={searchResults} />
         </div>
       </div>
     </div>

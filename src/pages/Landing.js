@@ -11,18 +11,27 @@ function NewLandingPage() {
   const { setSearchResults } = useSearch();
 
   const search = async () => {
-
     try {
       const response = await axiosInstance.get("/initial_query", {
         params: { user_query: userInput }
       });
+
       const searchResults = response.data.entries;
-      console.log(searchResults, "results");
+
+      const imageFetchingPromises = searchResults.map(async (property) => {
+        const response = await axiosInstance.get("/getPrimaryImageUrl", {
+          params: { propertyId: property.propertyId }
+        });
+
+        property.primaryImage = response.data;
+      });
+      await Promise.all(imageFetchingPromises);
 
       setSearchResults(searchResults);
+
       navigate('/properties');
     } catch (error) {
-      navigate('/properties')
+      navigate('/properties');
     }
   };
 
