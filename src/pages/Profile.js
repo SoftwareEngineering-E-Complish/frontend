@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import ProductListBody from '../components/products/ProductListBody';
+import ProductResultsBody from '../components/products/ProductResultsBody';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useNavigate } from 'react-router-dom';
 import axiosInstance from '../api/axiosInstance';
@@ -108,7 +108,7 @@ function ProfilePage() {
                         <div className="card mb-3">
                             <h4 className="card-header">Your Properties</h4>
                             <div className="card-body">
-                                <ProductListBody products={userProperties} />
+                                <ProductResultsBody products={userProperties} />
                             </div>
                         </div>
                     </div>
