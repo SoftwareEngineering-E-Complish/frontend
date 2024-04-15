@@ -1,27 +1,45 @@
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useEffect, useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Product from "../../products/Product";
 import ProductH from "../../products/ProductH";
 import { useSearch } from '../../SearchContext';
 import axiosInstance from '../../api/axiosInstance';
 import mapFormValuesToQueryParams from '../helpers/mapFormValuesToQueryParams';
-import { GoogleMap, useJsApiLoader, Marker, MarkerWithLabel } from '@react-google-maps/api';
+import { GoogleMap, LoadScript, Marker } from '@react-google-maps/api';
 
 
 function ProductResultsBody({ products }) {
     const { handleInputChange, queryInfo, setSearchResults, setQueryInfo, formValues } = useSearch();
     const [viewType, setViewType] = useState({ grid: true });
     const [showMapView, setShowMapView] = useState(false);
-    const [center, setCenter] = useState({ lat: 45.421532, lng: -75.697189 });
+    const [center, setCenter] = useState({ lat: 47.3769, lng: 8.5417 });
     const currentPage = queryInfo.offset / queryInfo.limit + 1;
     const totalPages = Math.ceil(queryInfo.total / queryInfo.limit);
+    const [map, setMap] = useState(null);
+    const navigate = useNavigate();
 
-    const { isLoaded } = useJsApiLoader({
-        id: 'google-map-script',
-        googleMapsApiKey: "AIzaSyDkWh3Nr1WBBY3lgfbzjyyZeVLRUwJ6U0w"
-    })
+    const points = useMemo(() => {
+        return products.map((product) => product.coordinates ?? center);
+    }, [products]);
 
-    const [map, setMap] = useState(null)
+    useEffect(() => {
+        if (points.length > 0) {
+            const totalPoints = points.length;
+            let totalLat = 0;
+            let totalLng = 0;
+
+            points.forEach((point) => {
+                totalLat += point.lat;
+                totalLng += point.lng;
+            });
+
+            const avgLat = totalLat / totalPoints;
+            const avgLng = totalLng / totalPoints;
+
+            setCenter({ lat: avgLat, lng: avgLng });
+        }
+    }, [points]);
 
     const onLoad = useCallback(function callback(map) {
         // This is just an example of getting and using the map instance!!! don't just blindly copy!
@@ -110,31 +128,39 @@ function ProductResultsBody({ products }) {
                     </button>
                 </div>
             </div>
-            {isLoaded && showMapView ? (<div className={"g-3 mb-4 flex-shrink-0"}>
+            {showMapView ? (<div className={"g-3 mb-4 flex-shrink-0"}>
                 {
                     <div className={"h-100 w-100"}>
-                        <GoogleMap
-                            mapContainerStyle={{
-                                height: '100vh',
-                                width: '100%',
-                                minHeight: '100%',
-                                maxHeight: 'none'
-                            }}
-                            center={center}
-                            zoom={10}
-                            onLoad={onLoad}
-                            onUnmount={onUnmount}
-                        >
-                            { /* Child components, such as markers, info windows, etc. */}
-                            {products.map((product, i) => {
-                                return (<Marker
-                                    position={center}
-                                    icon={<FontAwesomeIcon icon="fa-regular fa-map" />}
-                                    label={product.title}
-                                />);
-                            })}
-
-                        </GoogleMap>
+                        <LoadScript googleMapsApiKey="AIzaSyDkWh3Nr1WBBY3lgfbzjyyZeVLRUwJ6U0w">
+                            <GoogleMap
+                                mapContainerStyle={{
+                                    height: '100vh',
+                                    width: '100%',
+                                    minHeight: '100%',
+                                    maxHeight: 'none'
+                                }}
+                                center={center}
+                                zoom={12}
+                                onLoad={onLoad}
+                                onUnmount={onUnmount}
+                            >
+                                {products.map((product, i) => {
+                                    return (<Marker
+                                        key={product.propertyId}
+                                        position={product.coordinates ?? center}
+                                        onClick={() => navigate({
+                                            pathname: `/properties/${product.propertyId}`,
+                                            state: { property: product }
+                                        })}
+                                        icon={{
+                                            url: require("../../assets/icon/home.png"),
+                                            labelOrigin: { x: 0, y: 40 },
+                                        }}
+                                        label={product.title}
+                                    />);
+                                })}
+                            </GoogleMap>
+                        </LoadScript>
                     </div>}
             </div>)
                 :
