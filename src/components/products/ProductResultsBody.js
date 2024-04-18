@@ -6,7 +6,8 @@ import ProductH from "../../products/ProductH";
 import { useSearch } from '../../SearchContext';
 import axiosInstance from '../../api/axiosInstance';
 import mapFormValuesToQueryParams from '../helpers/mapFormValuesToQueryParams';
-import GoogleMapReact from 'google-map-react';
+import Map from '../map/Map';
+
 
 
 function ProductResultsBody({ properties }) {
@@ -15,24 +16,6 @@ function ProductResultsBody({ properties }) {
     const [showMapView, setShowMapView] = useState(false);
     const currentPage = queryInfo.offset / queryInfo.limit + 1;
     const totalPages = Math.ceil(queryInfo.total / queryInfo.limit);
-    const [map, setMap] = useState(null);
-    const navigate = useNavigate();
-
-    const points = useMemo(() => {
-        return properties?.map((property) => ({ lat: property.latitude, lng: property.longitude })) ?? [];
-    }, [properties]);
-
-    const onLoad = useCallback(function callback(map) {
-        const bounds = new window.google.maps.LatLngBounds();
-        points.forEach(point => bounds.extend(point));
-        map.fitBounds(bounds);
-
-        setMap(map);
-    }, [points]);
-
-    const onUnmount = useCallback(function callback(map) {
-        setMap(null)
-    }, [])
 
     const handleChangePage = async (newOffset) => {
         const queryParams = mapFormValuesToQueryParams(formValues);
@@ -110,64 +93,7 @@ function ProductResultsBody({ properties }) {
                 </div>
             </div>
             {showMapView ? (<div className={"g-3 mb-4 flex-shrink-0"}>
-                {
-                    <div className={"h-100 w-100"}>
-                        {/* <LoadScript googleMapsApiKey="AIzaSyDkWh3Nr1WBBY3lgfbzjyyZeVLRUwJ6U0w"> */}
-                        <GoogleMapReact
-                            bootstrapURLKeys={{ key: "AIzaSyDkWh3Nr1WBBY3lgfbzjyyZeVLRUwJ6U0w" }}
-                            style={{
-                                height: '100vh',
-                                width: '100%',
-                                minHeight: '100%',
-                                maxHeight: 'none'
-                            }}
-                            // defaultCenter={defaultProps.center}
-                            // defaultZoom={defaultProps.zoom}
-                            onGoogleApiLoaded={onLoad}
-                            shouldUnregisterMapOnUnmount={true}
-                        >
-                            {properties.map((property, i) => {
-                                return (<div
-                                    key={property.propertyId}
-                                    lat={property.latitude}
-                                    lng={property.longitude}
-                                    onClick={() => navigate({
-                                        pathname: `/properties/${property.propertyId}`,
-                                        state: { property: property }
-                                    })}
-                                    text={property.title}>
-                                    <img src={require("../../assets/icon/home.png")} alt="home" />
-                                </div>);
-                            })}
-                        </GoogleMapReact>
-                        {/* <GoogleMap
-                                mapContainerStyle={{
-                                    height: '100vh',
-                                    width: '100%',
-                                    minHeight: '100%',
-                                    maxHeight: 'none'
-                                }}
-                                onLoad={onLoad}
-                                onUnmount={onUnmount}
-                            >
-                                {properties.map((property, i) => {
-                                    return (<Marker
-                                        key={property.propertyId}
-                                        position={{ lat: property.latitude, lng: property.longitude }}
-                                        onClick={() => navigate({
-                                            pathname: `/properties/${property.propertyId}`,
-                                            state: { property: property }
-                                        })}
-                                        icon={{
-                                            url: require("../../assets/icon/home.png"),
-                                            labelOrigin: { x: 0, y: 40 },
-                                        }}
-                                        label={property.title}
-                                    />);
-                                })}
-                            </GoogleMap> */}
-                        {/* </LoadScript> */}
-                    </div>}
+                <Map properties={properties} />
             </div>)
                 :
                 (<div

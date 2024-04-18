@@ -25,7 +25,7 @@
     "web-vitals": "^3.5.2"
   },
   "scripts": {
-    "dev": "set PORT=8000 && react-scripts start",
+    "dev": "cross-env PORT=8000 react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
@@ -53,6 +53,9 @@
   "devDependencies": {
     "@types/react": "^18.2.0",
     "@types/react-dom": "^18.2.21",
+    "cross-env": "^7.0.3",
+    "dotenv": "^16.4.5",
+    "dotenv-cli": "^7.4.1",
     "gh-pages": "^6.1.1"
   }
 }
