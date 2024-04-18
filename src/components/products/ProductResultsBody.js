@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect, useMemo } from 'react';
+import { useState, useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Product from "../../products/Product";
@@ -6,7 +6,7 @@ import ProductH from "../../products/ProductH";
 import { useSearch } from '../../SearchContext';
 import axiosInstance from '../../api/axiosInstance';
 import mapFormValuesToQueryParams from '../helpers/mapFormValuesToQueryParams';
-import { GoogleMap, LoadScript, Marker } from '@react-google-maps/api';
+import GoogleMapReact from 'google-map-react';
 
 
 function ProductResultsBody({ properties }) {
@@ -112,8 +112,35 @@ function ProductResultsBody({ properties }) {
             {showMapView ? (<div className={"g-3 mb-4 flex-shrink-0"}>
                 {
                     <div className={"h-100 w-100"}>
-                        <LoadScript googleMapsApiKey="AIzaSyDkWh3Nr1WBBY3lgfbzjyyZeVLRUwJ6U0w">
-                            <GoogleMap
+                        {/* <LoadScript googleMapsApiKey="AIzaSyDkWh3Nr1WBBY3lgfbzjyyZeVLRUwJ6U0w"> */}
+                        <GoogleMapReact
+                            bootstrapURLKeys={{ key: "AIzaSyDkWh3Nr1WBBY3lgfbzjyyZeVLRUwJ6U0w" }}
+                            style={{
+                                height: '100vh',
+                                width: '100%',
+                                minHeight: '100%',
+                                maxHeight: 'none'
+                            }}
+                            // defaultCenter={defaultProps.center}
+                            // defaultZoom={defaultProps.zoom}
+                            onGoogleApiLoaded={onLoad}
+                            shouldUnregisterMapOnUnmount={true}
+                        >
+                            {properties.map((property, i) => {
+                                return (<div
+                                    key={property.propertyId}
+                                    lat={property.latitude}
+                                    lng={property.longitude}
+                                    onClick={() => navigate({
+                                        pathname: `/properties/${property.propertyId}`,
+                                        state: { property: property }
+                                    })}
+                                    text={property.title}>
+                                    <img src={require("../../assets/icon/home.png")} alt="home" />
+                                </div>);
+                            })}
+                        </GoogleMapReact>
+                        {/* <GoogleMap
                                 mapContainerStyle={{
                                     height: '100vh',
                                     width: '100%',
@@ -138,8 +165,8 @@ function ProductResultsBody({ properties }) {
                                         label={property.title}
                                     />);
                                 })}
-                            </GoogleMap>
-                        </LoadScript>
+                            </GoogleMap> */}
+                        {/* </LoadScript> */}
                     </div>}
             </div>)
                 :

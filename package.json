@@ -12,21 +12,20 @@
     "@fortawesome/react-fontawesome": "^0.2.0",
     "@mui/icons-material": "^5.15.15",
     "@mui/material": "^5.15.15",
-    "@react-google-maps/api": "^2.19.3",
     "axios": "^1.6.7",
     "bootstrap": "^5.3.3",
+    "google-map-react": "^2.2.1",
     "mui": "^0.0.1",
     "react": "^18.2.0",
     "react-beautiful-dnd": "^13.1.1",
     "react-dom": "^18.2.0",
-    "react-google-maps": "^9.4.5",
     "react-ratings-declarative": "^3.4.1",
     "react-router-dom": "^6.22.3",
     "react-scripts": "5.0.1",
     "web-vitals": "^3.5.2"
   },
   "scripts": {
-    "dev": "PORT=8000 react-scripts start",
+    "dev": "set PORT=8000 && react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
@@ -52,7 +51,7 @@
     ]
   },
   "devDependencies": {
-    "@types/react": "^16.14.60",
+    "@types/react": "^18.2.0",
     "@types/react-dom": "^18.2.21",
     "gh-pages": "^6.1.1"
   }
