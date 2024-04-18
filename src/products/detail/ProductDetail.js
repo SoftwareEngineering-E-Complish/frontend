@@ -1,9 +1,11 @@
 import RelatedProduct from "./RelatedProduct";
 import Ratings from "react-ratings-declarative";
-import { Link, useParams , useLocation} from "react-router-dom";
+import { Link, useParams, useLocation } from "react-router-dom";
 import ScrollToTopOnMount from "../../template/ScrollToTopOnMount";
-import { housesData } from'../../mockdata';
+import { housesData } from '../../mockdata';
 import { useSearch } from '../../SearchContext';
+import getPropertySecondaryImages from "../../api/queries";
+import { useEffect, useState } from "react";
 
 const iconPath =
   "M18.571 7.221c0 0.201-0.145 0.391-0.29 0.536l-4.051 3.951 0.96 5.58c0.011 0.078 0.011 0.145 0.011 0.223 0 0.29-0.134 0.558-0.458 0.558-0.156 0-0.313-0.056-0.446-0.134l-5.011-2.634-5.011 2.634c-0.145 0.078-0.29 0.134-0.446 0.134-0.324 0-0.469-0.268-0.469-0.558 0-0.078 0.011-0.145 0.022-0.223l0.96-5.58-4.063-3.951c-0.134-0.145-0.279-0.335-0.279-0.536 0-0.335 0.346-0.469 0.625-0.513l5.603-0.815 2.511-5.078c0.1-0.212 0.29-0.458 0.547-0.458s0.446 0.246 0.547 0.458l2.511 5.078 5.603 0.815c0.268 0.045 0.625 0.179 0.625 0.513z";
@@ -12,22 +14,28 @@ function ProductDetail() {
   let { id } = useParams();
   const { searchResults } = useSearch();
   const property = searchResults.find(p => p.propertyId === Number(id));
-// Loop through each item in the searchResults to log its propertyId value and type
-  searchResults.forEach(p => console.log(`Value: ${p.propertyId}, Type: ${typeof p.propertyId}`));
-
-// Log the target id value and its type
-  console.log(`Target ID: Value: ${id}, Type: ${typeof id}`);
-
-
-  //const location = useLocation();
-  //const { property } = location.state || {};
-  //const property = housesData.find(house => house.propertyId === Number(id));
   const agent = housesData[0].agent;
-  const image = housesData[1].imageLg;
+  const image = property?.primaryImage ?? housesData[1].imageLg;
+  const [secondaryImages, setSecondaryImages] = useState([]);
+
+  useEffect(() => {
+    const fetchSecondaryImages = async () => {
+      try {
+        const images = await getPropertySecondaryImages(property.propertyId);
+        setSecondaryImages(images);
+      } catch (error) {
+        console.error('Error fetching secondary images:', error);
+      }
+    };
+
+    fetchSecondaryImages();
+  }, [property.propertyId]);
+
+
 
   return (
     <div className="container mt-5 py-4 px-xl-5">
-      <ScrollToTopOnMount/>
+      <ScrollToTopOnMount />
       <nav aria-label="breadcrumb" className="bg-custom-light rounded mb-4">
         <ol className="breadcrumb p-3">
           <li className="breadcrumb-item">
@@ -49,14 +57,18 @@ function ProductDetail() {
         <div className="d-none d-lg-block col-lg-1">
           <div className="image-vertical-scroller">
             <div className="d-flex flex-column">
-              {Array.from({ length: 10 }, (_, i) => {
+              {secondaryImages?.map((secondaryImage, i) => {
                 let selected = i !== 1 ? "opacity-6" : "";
                 return (
                   <a key={i} href="">
                     <img
                       className={"rounded mb-2 ratio " + selected}
                       alt=""
-                      src={image}
+                      src={secondaryImage ?? image}
+                      onError={(e) => {
+                        e.target.onerror = null;
+                        e.target.src = housesData[1].image;
+                      }}
                     />
                   </a>
                 );
@@ -71,11 +83,15 @@ function ProductDetail() {
                 className="border rounded ratio ratio-1x1"
                 alt=""
                 src={image}
+                onError={(e) => {
+                  e.target.onerror = null;
+                  e.target.src = housesData[1].imageLg;
+                }}
               />
             </div>
           </div>
 
-          
+
         </div>
 
         <div className="col-lg-5">
@@ -90,8 +106,8 @@ function ProductDetail() {
                 </button>
               </div>
               <div className="col">
-                <Link to={{ pathname: "/profile" }} state={{agent: agent }} className="btn btn-dark py-2 w-100">View profile</Link>
-            </div>
+                <Link to={{ pathname: "/profile" }} state={{ agent: agent }} className="btn btn-dark py-2 w-100">View profile</Link>
+              </div>
             </div>
 
             <h4 className="mb-0">Details</h4>
@@ -159,7 +175,7 @@ function ProductDetail() {
           <div className="row row-cols-1 row-cols-md-3 row-cols-lg-4 g-3">
             {Array.from({ length: 4 }, (_, i) => {
               return (
-                <RelatedProduct key={i} index={i}/>
+                <RelatedProduct key={i} index={i} />
               );
             })}
           </div>

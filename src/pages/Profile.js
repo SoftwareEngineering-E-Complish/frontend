@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import ProductListBody from '../components/products/ProductListBody';
+import ProductResultsBody from '../components/products/ProductResultsBody';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useNavigate } from 'react-router-dom';
 import axiosInstance from '../api/axiosInstance';
@@ -43,7 +43,8 @@ function ProfilePage() {
     useEffect(() => {
         async function getUserProperties(username) {
             try {
-                let response = await axiosInstance.get(`/fetchPropertiesByUser`, { params: { userId: username /*accessToken: accessToken*/ } });
+                let response = await axiosInstance.get(`/fetchPropertiesByUser`, { params: { userId: username } });
+
                 setUserProperties(response.data);
             } catch (error) {
                 console.error('Error fetching user properties:', error);
@@ -108,7 +109,7 @@ function ProfilePage() {
                         <div className="card mb-3">
                             <h4 className="card-header">Your Properties</h4>
                             <div className="card-body">
-                                <ProductListBody products={userProperties} />
+                                <ProductResultsBody properties={userProperties} />
                             </div>
                         </div>
                     </div>

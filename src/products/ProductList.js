@@ -1,7 +1,7 @@
 import { Link, useLocation } from "react-router-dom";
 import ScrollToTopOnMount from "../template/ScrollToTopOnMount";
 import { useSearch } from '../SearchContext';
-import ProductListBody from "../components/products/ProductListBody";
+import ProductResultsBody from "../components/products/ProductResultsBody";
 import FilterMenuLeft from "../components/products/FilterMenuLeft";
 
 function ProductList() {
@@ -65,7 +65,7 @@ function ProductList() {
           </div>
         </div>
         <div className="col-lg-9">
-          <ProductListBody products={searchResults} />
+          <ProductResultsBody properties={searchResults} />
         </div>
       </div>
     </div>
