@@ -4,6 +4,9 @@ import { Link, useParams , useLocation} from "react-router-dom";
 import ScrollToTopOnMount from "../../template/ScrollToTopOnMount";
 import { housesData } from'../../mockdata';
 import { useSearch } from '../../SearchContext';
+import axios from 'axios';
+import React, { useState, useEffect } from 'react';
+import { jwtDecode } from 'jwt-decode';
 
 const iconPath =
   "M18.571 7.221c0 0.201-0.145 0.391-0.29 0.536l-4.051 3.951 0.96 5.58c0.011 0.078 0.011 0.145 0.011 0.223 0 0.29-0.134 0.558-0.458 0.558-0.156 0-0.313-0.056-0.446-0.134l-5.011-2.634-5.011 2.634c-0.145 0.078-0.29 0.134-0.446 0.134-0.324 0-0.469-0.268-0.469-0.558 0-0.078 0.011-0.145 0.022-0.223l0.96-5.58-4.063-3.951c-0.134-0.145-0.279-0.335-0.279-0.536 0-0.335 0.346-0.469 0.625-0.513l5.603-0.815 2.511-5.078c0.1-0.212 0.29-0.458 0.547-0.458s0.446 0.246 0.547 0.458l2.511 5.078 5.603 0.815c0.268 0.045 0.625 0.179 0.625 0.513z";
@@ -13,6 +16,12 @@ function ProductDetail() {
   const { searchResults } = useSearch();
   const property = searchResults.find(p => p.propertyId === Number(id));
 // Loop through each item in the searchResults to log its propertyId value and type
+  const [isInterested, setIsInterested] = useState(false);
+  const [interestButtonText, setInterestButtonText] = useState("Declare Interest");
+  const idToken = localStorage.getItem('idToken');
+  const decoded = jwtDecode(idToken);
+  const userId = decoded.sub;
+
   searchResults.forEach(p => console.log(`Value: ${p.propertyId}, Type: ${typeof p.propertyId}`));
 
 // Log the target id value and its type
@@ -24,6 +33,56 @@ function ProductDetail() {
   //const property = housesData.find(house => house.propertyId === Number(id));
   const agent = housesData[0].agent;
   const image = housesData[1].imageLg;
+
+  useEffect(() => {
+    checkInterestStatus();
+  }, [id]);
+
+  const checkInterestStatus = async () => {
+    try {
+    
+      const response = await axios.get(`http://localhost:7200/fetchInterestsByUser?userId=${encodeURIComponent(userId)}`);
+      const interests = response.data; 
+
+      const isInterested = interests.some(interest => interest.propertyId === Number(id));
+      setIsInterested(isInterested);
+      console.log('Interest Check:', isInterested); 
+      setInterestButtonText(isInterested ? "Remove Interest" : "Declare Interest");
+    } catch (error) {
+      console.error('Failed to fetch interest status:', error);
+      setIsInterested(false);
+      setInterestButtonText("Declare Interest");
+    }
+  };
+
+
+  const handleInterest = async () => {
+    const timestamp = new Date().toISOString();
+
+    if (!isInterested) {
+      try {
+        await axios.post('http://localhost:7200/declareInterest', {
+          propertyId: Number(id),
+          userId: userId,
+          timestamp: timestamp
+        });
+        setIsInterested(true);
+        setInterestButtonText("Remove Interest");
+      } catch (error) {
+        console.error('Error declaring interest:', error);
+      }
+    } else {
+      try {
+        await axios.delete('http://localhost:7200/removeInterest', {
+          data: { propertyId: Number(id), userId: userId }
+        });
+        setIsInterested(false);
+        setInterestButtonText("Declare Interest");
+      } catch (error) {
+        console.error('Error removing interest:', error);
+      }
+    }
+  };
 
   return (
     <div className="container mt-5 py-4 px-xl-5">
@@ -85,8 +144,8 @@ function ProductDetail() {
 
             <div className="row g-3 mb-4">
               <div className="col">
-                <button className="btn btn-outline-dark py-2 w-100">
-                  Add to favorites
+                <button className="btn btn-outline-dark py-2 w-100" onClick={handleInterest}>
+                {interestButtonText}
                 </button>
               </div>
               <div className="col">
