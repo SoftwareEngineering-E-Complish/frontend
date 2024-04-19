@@ -22,7 +22,6 @@ function Header() {
     event.preventDefault();
     try {
       const response = await axiosInstance.get("/signupURL");
-      console.log("Signup URL: " + response.data);
 
       //setSearchResults(searchResults); // Set search results in global state
       window.location.replace(response.data);
@@ -35,7 +34,6 @@ function Header() {
     event.preventDefault();
     try {
       const response = await axiosInstance.get("/loginURL");
-      console.log("Login URL: " + response.data);
       //setSearchResults(searchResults); // Set search results in global state
       window.location.replace(response.data);
     } catch (error) {
@@ -79,12 +77,11 @@ function Header() {
   useEffect(() => {
     const checkToken = () => {
       const token = localStorage.getItem('accessToken');
-      console.log(token);
       setLoggedIn(!!token);
     };
     checkToken();
     const handleStorageChange = (event) => {
-      console.log("Local Storage Change Detected:", event.detail);
+    
       checkToken();
     };
 
@@ -93,7 +90,7 @@ function Header() {
 
   }, []);
 
-  console.log("logged in: " + loggedIn);
+  
   return (
     <header>
       <nav className="navbar fixed-top navbar-expand-lg navbar-light bg-white border-bottom ">

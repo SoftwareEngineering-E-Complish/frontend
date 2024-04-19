@@ -6,6 +6,7 @@ export const useSearch = () => useContext(SearchContext);
 
 export const SearchProvider = ({ children }) => {
   const [searchResults, setSearchResults] = useState([]);
+  const [allProperties, setAllProperties] = useState([]);
 
   const [formValues, setFormValues] = useState({
     priceMin: 0,
@@ -43,6 +44,7 @@ export const SearchProvider = ({ children }) => {
       searchResults,
       setSearchResults,
       formValues,
+      setFormValues,
       handleInputChange, 
       queryInfo,
       setQueryInfo}}>

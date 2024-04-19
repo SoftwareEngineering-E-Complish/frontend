@@ -4,15 +4,32 @@ import { housesData } from'../../mockdata';
 import { faMapMarkerAlt } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useSearch } from '../../SearchContext';
+import axios from 'axios';
+import React, { useState, useEffect } from 'react';
 
 function RelatedProduct(props) {
   let { id } = useParams();
-  console.log("id" + id);
   const { searchResults } = useSearch();
-  const property = searchResults.find(p => p.propertyId === Number(id));
+  const [property, setProperty] = useState(null);
+  //const property = searchResults.find(p => p.propertyId === Number(id));
   const image = housesData[3].image;
   
+
+  useEffect(() => {
+
+    const fetchProperty = async () => {
+      var prop = await searchResults.find(p => p.propertyId === Number(id));
+      if (prop === undefined){
+        const response = await axios.get(`http://localhost:8004/properties/${id}`); 
+        prop = response.data;
+      }
+      setProperty(prop);
+    }
+    fetchProperty();
+
+  }, [id]);
     
+  if (!property) return <div className="spinner text-center">Loading...</div>;
   return (
     <Link
       to="/properties/1"

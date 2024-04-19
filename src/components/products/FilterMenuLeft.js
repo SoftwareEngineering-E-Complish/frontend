@@ -31,9 +31,6 @@ function FilterMenuLeft() {
 
       setSearchResults(entries); 
       setQueryInfo({ total, offset, limit });
-      console.log(response.data, "response");
-      console.log(formValues, "filter state");
-      console.log(filteredParams, "params")
     } catch (error) {
     }
   };
@@ -78,7 +75,7 @@ function FilterMenuLeft() {
             onChange={handleInputChange}
             className="form-select"
             aria-label="Default select example"
-            defaultValue=""
+            value={formValues.location}
           >
             <option value="">Anywhere</option>
             <option value="Zurich">Zurich</option>
