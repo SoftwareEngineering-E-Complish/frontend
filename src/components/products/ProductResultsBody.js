@@ -6,7 +6,7 @@ import ProductH from "../../products/ProductH";
 import { useSearch } from '../../SearchContext';
 import axiosInstance from '../../api/axiosInstance';
 import mapFormValuesToQueryParams from '../helpers/mapFormValuesToQueryParams';
-import Map from '../map/Map';
+import MapView from '../map/Map';
 
 
 
@@ -93,7 +93,7 @@ function ProductResultsBody({ properties }) {
                 </div>
             </div>
             {showMapView ? (<div className={"g-3 mb-4 flex-shrink-0"}>
-                <Map properties={properties} />
+                <MapView properties={properties} />
             </div>)
                 :
                 (<div
