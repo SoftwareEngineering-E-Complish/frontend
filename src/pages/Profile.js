@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import ProductResultsBody from '../components/products/ProductResultsBody';
-import ProductListBody from '../components/products/ProductListBody';
 import SimpleProductList from '../components/products/SimpleProductList';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useNavigate } from 'react-router-dom';

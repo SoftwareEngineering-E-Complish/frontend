@@ -1,18 +1,10 @@
 import { useCallback, useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
 import GoogleMapReact from 'google-map-react';
 import Marker from './Marker';
 
-const apiKey = process.env.GOOGLE_MAPS_API_KEY ?? "AIzaSyDkWh3Nr1WBBY3lgfbzjyyZeVLRUwJ6U0w";
-
-
-console.log(process.env);
-
-console.log(apiKey);
-
-const Map = ({ properties }) => {
-    const center = { lat: 47.3769, lng: 8.5417 }
-    const navigate = useNavigate();
+const MapView = ({ properties }) => {
+    const apiKey = process.env.REACT_APP_GOOGLE_MAPS_API_KEY;
+    const center = { lat: 47.3769, lng: 8.5417 };
 
     const points = useMemo(() => {
         return properties?.map((property) => ({ lat: property.latitude, lng: property.longitude })) ?? [];
@@ -45,11 +37,7 @@ const Map = ({ properties }) => {
                     key={property.propertyId}
                     lat={property.latitude}
                     lng={property.longitude}
-                    onClick={() => navigate({
-                        pathname: `/properties/${property.propertyId}`,
-                        state: { property: property }
-                    })}
-                    style={{ cursor: 'pointer' }}
+                    property={property}
                     text={property.title}
                     img={require("../../assets/icon/home.png")}
                 />
@@ -58,4 +46,4 @@ const Map = ({ properties }) => {
     </div>
 };
 
-export default Map;
+export default MapView;

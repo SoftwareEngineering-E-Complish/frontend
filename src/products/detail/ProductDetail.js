@@ -1,11 +1,10 @@
 import RelatedProduct from "./RelatedProduct";
 import Ratings from "react-ratings-declarative";
-import { Link, useParams, useLocation } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import ScrollToTopOnMount from "../../template/ScrollToTopOnMount";
 import { housesData } from '../../mockdata';
 import { useSearch } from '../../SearchContext';
 import getPropertySecondaryImages from "../../api/queries";
-import { useEffect, useState } from "react";
 import axios from 'axios';
 import React, { useState, useEffect } from 'react';
 import { jwtDecode } from 'jwt-decode';
@@ -17,16 +16,20 @@ function ProductDetail() {
   let { id } = useParams();
   const { searchResults } = useSearch();
   const property = searchResults.find(p => p.propertyId === Number(id));
-// Loop through each item in the searchResults to log its propertyId value and type
+  // Loop through each item in the searchResults to log its propertyId value and type
   const [isInterested, setIsInterested] = useState(false);
   const [interestButtonText, setInterestButtonText] = useState("Declare Interest");
   const idToken = localStorage.getItem('idToken');
-  const decoded = jwtDecode(idToken);
-  const userId = decoded.sub;
+  console.log('ID Token:', idToken);
+  let userId = '';
+  if (idToken && idToken !== '') {
+    const decoded = jwtDecode(idToken);
+    userId = decoded.sub;
+  }
 
   searchResults.forEach(p => console.log(`Value: ${p.propertyId}, Type: ${typeof p.propertyId}`));
 
-// Log the target id value and its type
+  // Log the target id value and its type
   console.log(`Target ID: Value: ${id}, Type: ${typeof id}`);
 
 
@@ -58,13 +61,13 @@ function ProductDetail() {
 
   const checkInterestStatus = async () => {
     try {
-    
+
       const response = await axios.get(`http://localhost:7200/fetchInterestsByUser?userId=${encodeURIComponent(userId)}`);
-      const interests = response.data; 
+      const interests = response.data;
 
       const isInterested = interests.some(interest => interest.propertyId === Number(id));
       setIsInterested(isInterested);
-      console.log('Interest Check:', isInterested); 
+      console.log('Interest Check:', isInterested);
       setInterestButtonText(isInterested ? "Remove Interest" : "Declare Interest");
     } catch (error) {
       console.error('Failed to fetch interest status:', error);
@@ -171,7 +174,7 @@ function ProductDetail() {
             <div className="row g-3 mb-4">
               <div className="col">
                 <button className="btn btn-outline-dark py-2 w-100" onClick={handleInterest}>
-                {interestButtonText}
+                  {interestButtonText}
                 </button>
               </div>
               <div className="col">
