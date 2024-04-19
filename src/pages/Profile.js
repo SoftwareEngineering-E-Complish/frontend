@@ -1,8 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import ProductResultsBody from '../components/products/ProductResultsBody';
+import ProductListBody from '../components/products/ProductListBody';
+import SimpleProductList from '../components/products/SimpleProductList';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useNavigate } from 'react-router-dom';
 import axiosInstance from '../api/axiosInstance';
+import { jwtDecode } from 'jwt-decode';
+import axios from 'axios';
 
 function ProfilePage() {
     const accessToken = localStorage.getItem('accessToken');
@@ -12,7 +16,11 @@ function ProfilePage() {
     const [updateStatus, setUpdateStatus] = useState('');
     const [userData, setUserData] = useState();
     const [userProperties, setUserProperties] = useState();
+    const [UserInterests, setUserInterests] = useState();
     const navigate = useNavigate();
+    const idToken = localStorage.getItem('idToken');
+    const decoded = jwtDecode(idToken);
+    const userId = decoded.sub;
 
     const updateUserFields = (e) => {
         const { name, value } = e.target;
@@ -50,12 +58,22 @@ function ProfilePage() {
                 console.error('Error fetching user properties:', error);
             }
         }
+        async function getUserInterests(userId) {
+            try {
+                //let response = await axiosInstance.get(`/fetchInterestsByUser`, { params: { userId: username /*accessToken: accessToken*/ } });
+                const response = await axios.get(`http://localhost:7200/fetchInterestsByUser?userId=${encodeURIComponent(userId)}`);
+                const interestIds = response.data.map(interest => interest.propertyId);
+                setUserInterests(interestIds);
+            } catch (error) {
+                console.error('Error fetching user properties:', error);
+            }
+        }
 
         async function getUserData() {
             try {
                 let response = await axiosInstance.get('/user', { params: { accessToken: accessToken } });
                 setUserData(response.data);
-
+                getUserInterests(userId);
                 getUserProperties(response.data.username);
             } catch (error) {
                 console.error('Error fetching user data:', error);
@@ -110,6 +128,14 @@ function ProfilePage() {
                             <h4 className="card-header">Your Properties</h4>
                             <div className="card-body">
                                 <ProductResultsBody properties={userProperties} />
+                            </div>
+                        </div>
+                    </div>
+                    <div className="col-md-12">
+                        <div className="card mb-3">
+                            <h4 className="card-header">Properties you are interested in</h4>
+                            <div className="card-body">
+                                <SimpleProductList propertyIds={UserInterests} />
                             </div>
                         </div>
                     </div>
