@@ -38,6 +38,7 @@ function AddPage({ newCreated }) {
         bathrooms: '',
         bedrooms: '',
         location: '',
+        address: '',
         year_built: '',
         description: '',
         images: [],
@@ -155,7 +156,7 @@ function AddPage({ newCreated }) {
     <form onSubmit={handleSubmit}>
         <Typography variant="h4" align="center" sx={{ mb: 4 ,py:1}}>Create Ad</Typography>
         <Box sx={{ display: 'flex', flexDirection: 'column',alignItems:"center", py:1}}>
-        <TextField label="title" name="title" onChange={handleChange} sx={{ mb: verticalPadding, width:fieldWidth, alignContent:'center'}} />
+        <TextField label="Title" name="title" onChange={handleChange} sx={{ mb: verticalPadding, width:fieldWidth, alignContent:'center'}} />
         <FormControl sx={{ mb: verticalPadding, width:fieldWidth, alignContent:'center'}}>
         <InputLabel id="select_property_type">Type of property</InputLabel>
         <Select
@@ -174,7 +175,8 @@ function AddPage({ newCreated }) {
         <TextField label="Construction year" name="year_built" type="number" onChange={handleChange} sx={{ mb: verticalPadding, width: fieldWidth }}/>
         <TextField label="Number of Bathrooms" name="bathrooms" type="number" onChange={handleChange} sx={{ mb: verticalPadding, width: fieldWidth }}/>
         <TextField label="Number of Bedrooms" name="bedrooms" type="number" onChange={handleChange} sx={{ mb: verticalPadding, width: fieldWidth }}/>
-        <TextField label="location" name="location" onChange={handleChange} sx={{ mb: verticalPadding, width: fieldWidth }}/>
+        <TextField label="City" name="location" onChange={handleChange} sx={{ mb: verticalPadding, width: fieldWidth }}/>
+        <TextField label="Address" name="address" onChange={handleChange} sx={{ mb: verticalPadding, width: fieldWidth }}/>
         <TextField label="Description" name="description" multiline rows={4} onChange={handleChange} sx={{ mb: verticalPadding, width: fieldWidth }}/>
 
         <Button variant="contained" component="label" onClick={handleButtonClick}>
