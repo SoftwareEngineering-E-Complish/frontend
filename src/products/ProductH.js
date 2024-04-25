@@ -1,5 +1,4 @@
-
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faMapMarkerAlt, faCartPlus } from '@fortawesome/free-solid-svg-icons';
 import '../bootstrap-custom.css';
@@ -10,6 +9,8 @@ function ProductH({ product }) {
   //const property = housesData.find(house => house.propertyId === productId);
   const property = product;
   const image = product.primaryImage ?? housesData[1].imageLg;
+  const location = useLocation();
+  const profilePage = location.pathname === '/profile';
 
   return (
     <div className="col">

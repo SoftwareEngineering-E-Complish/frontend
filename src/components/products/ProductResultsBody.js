@@ -11,7 +11,7 @@ import MapView from '../map/Map';
 
 
 function ProductResultsBody({ properties }) {
-    const { handleInputChange, queryInfo, setSearchResults, setQueryInfo, formValues } = useSearch();
+    const { handleInputChange, queryInfo, setSearchResults, setQueryInfo, formValues, handleApplyFilters } = useSearch();
     const [viewType, setViewType] = useState({ grid: true });
     const [showMapView, setShowMapView] = useState(false);
     const currentPage = queryInfo.offset / queryInfo.limit + 1;
@@ -51,7 +51,10 @@ function ProductResultsBody({ properties }) {
                         className="form-select"
                         aria-label="Default select example"
                         defaultValue=""
-                        onChange={handleInputChange}
+                        onChange={(event) => {
+                            handleInputChange(event)
+                            handleApplyFilters()
+                        }}
                     >
                         <option value="">Select order</option> {/* Assuming you want a placeholder option */}
                         <option value="price-asc">Price (lowest first)</option>
@@ -67,8 +70,8 @@ function ProductResultsBody({ properties }) {
                     </select>
 
                 </div>
-                <div className="col-lg-9 col-xl-5 offset-xl-4 d-flex flex-row">
-                    <div className="input-group">
+                <div className="col-lg-9 col-xl-5 offset-xl-4 d-flex flex-row justify-content-end">
+                    {/* <div className="input-group">
                         <input
                             className="form-control"
                             type="text"
@@ -78,7 +81,7 @@ function ProductResultsBody({ properties }) {
                         <button className="btn btn-outline-dark">
                             <FontAwesomeIcon icon={["fas", "search"]} />
                         </button>
-                    </div>
+                    </div> */}
                     <button
                         className="btn btn-outline-dark ms-2 d-none d-lg-inline"
                         onClick={changeViewType}

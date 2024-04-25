@@ -3,13 +3,16 @@ import axiosInstance from '../../api/axiosInstance';
 import { useState, useEffect } from 'react';
 import mapFormValuesToQueryParams from '../helpers/mapFormValuesToQueryParams';
 
+
 const categories = [
   "House",
   "Apartment"
 ];
 
 function FilterMenuLeft() {
-  const { formValues, handleInputChange, setSearchResults, setQueryInfo } = useSearch();
+
+  const { formValues, handleInputChange, handleApplyFilters, setSearchResults, setQueryInfo } = useSearch();
+  const [activePropertyTypeButtons, setActivePropertyTypeButtons] = useState([]);
   const [localFormValues, setLocalFormValues] = useState(formValues);
   const [errors, setErrors] = useState({});
 
@@ -83,7 +86,6 @@ function FilterMenuLeft() {
       console.error(error);
     }
   };
-
   return (
     <ul className="list-group list-group-flush rounded">
       <li className="list-group-item d-none d-lg-block">
@@ -92,8 +94,15 @@ function FilterMenuLeft() {
           {categories.map((category, i) => (
             <button
               key={i}
-              className="btn btn-sm btn-outline-dark rounded-pill me-2 mb-2"
-              onClick={() => handleInputChange({ target: { name: 'propertyType', value: category } })}
+              className={`btn btn-sm rounded-pill me-2 mb-2 ${activePropertyTypeButtons.includes(i) ? 'btn-dark' : 'btn-outline-dark'}`}
+              onClick={() => {
+                handleInputChange({ target: { name: 'propertyType', value: category } });
+                if (activePropertyTypeButtons.includes(i)) {
+                  setActivePropertyTypeButtons(activePropertyTypeButtons.filter(index => index !== i));
+                } else {
+                  setActivePropertyTypeButtons([...activePropertyTypeButtons, i]);
+                }
+              }}
             >
               {category}
             </button>
@@ -282,7 +291,7 @@ function FilterMenuLeft() {
       <li className="list-group-item">
         <button className="btn btn-dark" onClick={handleApplyFilters}>Apply</button>
       </li>
-    </ul>
+    </ul >
   );
 }
 
