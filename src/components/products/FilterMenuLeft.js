@@ -1,6 +1,5 @@
+import { useState } from 'react';
 import { useSearch } from '../../SearchContext';
-import axiosInstance from '../../api/axiosInstance';
-import mapFormValuesToQueryParams from '../helpers/mapFormValuesToQueryParams'
 
 const categories = [
   "House",
@@ -9,31 +8,9 @@ const categories = [
 
 //missing: set default form values
 function FilterMenuLeft() {
+  const { formValues, handleInputChange, handleApplyFilters, setSearchResults, setQueryInfo } = useSearch();
+  const [activePropertyTypeButtons, setActivePropertyTypeButtons] = useState([]);
 
-
-
-  const { formValues, handleInputChange, setSearchResults, setQueryInfo } = useSearch();
-
-  const handleApplyFilters = async () => {
-    const queryParams = mapFormValuesToQueryParams(formValues);
-    const filteredParams = Object.entries(queryParams).reduce((acc, [key, value]) => {
-      if (value !== null && value !== undefined) {
-        acc[key] = value;
-      }
-      return acc;
-    }, {});
-
-    try {
-      const response = await axiosInstance.get("http://localhost:8004/queryProperties", {
-        params: filteredParams
-      });
-      const { entries, total, offset, limit } = response.data;
-
-      setSearchResults(entries); 
-      setQueryInfo({ total, offset, limit });
-    } catch (error) {
-    }
-  };
   return (
     <ul className="list-group list-group-flush rounded">
       <li className="list-group-item d-none d-lg-block">
@@ -42,8 +19,15 @@ function FilterMenuLeft() {
           {categories.map((category, i) => (
             <button
               key={i}
-              className="btn btn-sm btn-outline-dark rounded-pill me-2 mb-2"
-              onClick={() => handleInputChange({ target: { name: 'propertyType', value: category } })}
+              className={`btn btn-sm rounded-pill me-2 mb-2 ${activePropertyTypeButtons.includes(i) ? 'btn-dark' : 'btn-outline-dark'}`}
+              onClick={() => {
+                handleInputChange({ target: { name: 'propertyType', value: category } });
+                if (activePropertyTypeButtons.includes(i)) {
+                  setActivePropertyTypeButtons(activePropertyTypeButtons.filter(index => index !== i));
+                } else {
+                  setActivePropertyTypeButtons([...activePropertyTypeButtons, i]);
+                }
+              }}
             >
               {category}
             </button>
@@ -225,7 +209,7 @@ function FilterMenuLeft() {
       <li className="list-group-item">
         <button className="btn btn-dark" onClick={handleApplyFilters}>Apply</button>
       </li>
-    </ul>
+    </ul >
   );
 }
 
