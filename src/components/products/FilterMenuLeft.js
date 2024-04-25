@@ -1,21 +1,72 @@
 import { useSearch } from '../../SearchContext';
 import axiosInstance from '../../api/axiosInstance';
-import mapFormValuesToQueryParams from '../helpers/mapFormValuesToQueryParams'
+import { useState, useEffect } from 'react';
+import mapFormValuesToQueryParams from '../helpers/mapFormValuesToQueryParams';
 
 const categories = [
   "House",
   "Apartment"
 ];
 
-//missing: set default form values
 function FilterMenuLeft() {
-
-
-
   const { formValues, handleInputChange, setSearchResults, setQueryInfo } = useSearch();
+  const [localFormValues, setLocalFormValues] = useState(formValues);
+  const [errors, setErrors] = useState({});
+
+  useEffect(() => {
+    setLocalFormValues(formValues);
+  }, [formValues]);
+
+  const handleLocalInputChange = (event) => {
+    const { name, value } = event.target;
+    const updatedFormValues = { ...localFormValues, [name]: value };
+
+    setLocalFormValues(updatedFormValues); 
+    validateInput(name, value, updatedFormValues); 
+  };
+
+  const validateInput = (name, value, updatedFormValues) => {
+    const validationPairs = {
+      bedroomMin: 'bedroomMax',
+      bedroomMax: 'bedroomMin',
+      bathroomMin: 'bathroomMax',
+      bathroomMax: 'bathroomMin',
+      squareMetersMin: 'squareMetersMax',
+      squareMetersMax: 'squareMetersMin',
+      yearBuiltMin: 'yearBuiltMax',
+      yearBuiltMax: 'yearBuiltMin'
+    };
+
+    const relatedKey = validationPairs[name];
+    let newErrors = {...errors};
+
+    if (relatedKey) {
+      const minKey = name.includes('Min') ? name : relatedKey;
+      const maxKey = name.includes('Max') ? name : relatedKey;
+      const minValue = updatedFormValues[minKey];
+      const maxValue = updatedFormValues[maxKey];
+
+      if (parseInt(minValue) > parseInt(maxValue)) {
+        newErrors[maxKey] = 'Max cannot be smaller than Min';
+      } else {
+        delete newErrors[maxKey];
+      }
+    }
+
+    setErrors(newErrors);
+  };
 
   const handleApplyFilters = async () => {
-    const queryParams = mapFormValuesToQueryParams(formValues);
+    if (Object.keys(errors).length > 0) {
+      alert("Please enter valid inputs for all fields before applying filters.");
+      return;
+    }
+
+    Object.entries(localFormValues).forEach(([key, value]) => {
+      handleInputChange({ target: { name: key, value } });
+    });
+
+    const queryParams = mapFormValuesToQueryParams(localFormValues);
     const filteredParams = Object.entries(queryParams).reduce((acc, [key, value]) => {
       if (value !== null && value !== undefined) {
         acc[key] = value;
@@ -24,16 +75,15 @@ function FilterMenuLeft() {
     }, {});
 
     try {
-      const response = await axiosInstance.get("http://localhost:8004/queryProperties", {
-        params: filteredParams
-      });
+      const response = await axiosInstance.get("http://localhost:8004/queryProperties", { params: filteredParams });
       const { entries, total, offset, limit } = response.data;
-
-      setSearchResults(entries); 
+      setSearchResults(entries);
       setQueryInfo({ total, offset, limit });
     } catch (error) {
+      console.error(error);
     }
   };
+
   return (
     <ul className="list-group list-group-flush rounded">
       <li className="list-group-item d-none d-lg-block">
@@ -59,8 +109,8 @@ function FilterMenuLeft() {
             type="range"
             min="0"
             max="10000000"
-            value={formValues.priceMax}
-            onChange={handleInputChange}
+            value={localFormValues.priceMax}
+            onChange={handleLocalInputChange}
             className="form-control-range"
           />
           <div>Max Price: ${formValues.priceMax.toLocaleString()}</div>
@@ -72,7 +122,7 @@ function FilterMenuLeft() {
         <div className="d-grid d-block mb-3">
           <select
             name="location"
-            onChange={handleInputChange}
+            onChange={handleLocalInputChange}
             className="form-select"
             aria-label="Default select example"
             value={formValues.location}
@@ -98,9 +148,9 @@ function FilterMenuLeft() {
           <div className="form-floating mb-2">
             <select
               name="bedroomMin"
-              onChange={handleInputChange}
+              onChange={handleLocalInputChange}
               className="form-control"
-              value={formValues.bedroomMin}
+              value={localFormValues.bedroomMin}
             >
               <option value="">Min</option> {formValues.bedroomMin}
               {Array.from({ length: 11 }, (_, index) => (
@@ -114,9 +164,9 @@ function FilterMenuLeft() {
           <div className="form-floating mb-2">
             <select
               name="bedroomMax"
-              onChange={handleInputChange}
+              onChange={handleLocalInputChange}
               className="form-control"
-              value={formValues.bedroomMax}
+              value={localFormValues.bedroomMax}
             >
               <option value="">Max</option> { }
               {Array.from({ length: 11 }, (_, index) => (
@@ -126,6 +176,7 @@ function FilterMenuLeft() {
               ))}
             </select>
             <label htmlFor="floatingInput">Max bedrooms</label>
+            {errors.bedroomMax && <div className="text-danger" style={{ fontSize: '0.75rem', marginTop: '0.5rem' }}>{errors.bedroomMax}</div>}
           </div>
         </div>
       </li>
@@ -135,9 +186,9 @@ function FilterMenuLeft() {
           <div className="form-floating mb-2">
             <select
               name="bathroomMin"
-              onChange={handleInputChange}
+              onChange={handleLocalInputChange}
               className="form-control"
-              value={formValues.bathroomMin}
+              value={localFormValues.bathroomMin}
             >
               <option value="">Min</option> {/* Optional placeholder-like option */}
               {Array.from({ length: 11 }, (_, index) => (
@@ -151,9 +202,9 @@ function FilterMenuLeft() {
           <div className="form-floating mb-2">
             <select
               name="bathroomMax"
-              onChange={handleInputChange}
+              onChange={handleLocalInputChange}
               className="form-control"
-              value={formValues.bathroomMax}
+              value={localFormValues.bathroomMax}
             >
               <option value="">Max</option> { }
               {Array.from({ length: 11 }, (_, index) => (
@@ -163,6 +214,8 @@ function FilterMenuLeft() {
               ))}
             </select>
             <label htmlFor="floatingInput">Max bathrooms</label>
+            {errors.bathroomMax && <div className="text-danger" style={{ fontSize: '0.75rem', marginTop: '0.5rem' }}>{errors.bathroomMax}</div>}
+
           </div>
         </div>
       </li>
@@ -174,24 +227,26 @@ function FilterMenuLeft() {
           <div className="form-floating mb-2">
             <input
               name="squareMetersMin"
-              onChange={handleInputChange}
+              onChange={handleLocalInputChange}
               type="text"
               className="form-control"
               placeholder="Min"
-              defaultValue={formValues.squareMetersMin}
+              defaultValue={localFormValues.squareMetersMin}
             />
             <label htmlFor="floatingInput">Min Surface</label>
           </div>
           <div className="form-floating mb-2">
             <input
               name="squareMetersMin"
-              onChange={handleInputChange}
+              onChange={handleLocalInputChange}
               type="text"
               className="form-control"
               placeholder="Max"
-              defaultValue={formValues.squareMetersMax}
+              defaultValue={localFormValues.squareMetersMax}
             />
             <label htmlFor="floatingInput">Max Surface</label>
+            {errors.squareMetersMax && <div className="text-danger" style={{ fontSize: '0.75rem', marginTop: '0.5rem' }}>{errors.squareMetersMax}</div>}
+
           </div>
         </div>
       </li>
@@ -201,24 +256,26 @@ function FilterMenuLeft() {
           <div className="form-floating mb-2">
             <input
               name="yearBuiltMin"
-              onChange={handleInputChange}
+              onChange={handleLocalInputChange}
               type="text"
               className="form-control"
               placeholder="Min"
-              defaultValue={formValues.yearBuiltMin}
+              defaultValue={localFormValues.yearBuiltMin}
             />
             <label htmlFor="floatingInput">Min Year</label>
           </div>
           <div className="form-floating mb-2">
             <input
               name="yearBuiltMin"
-              onChange={handleInputChange}
+              onChange={handleLocalInputChange}
               type="text"
               className="form-control"
               placeholder="Max"
-              defaultValue={formValues.yearBuiltMax}
+              defaultValue={localFormValues.yearBuiltMax}
             />
             <label htmlFor="floatingInput">Max Year</label>
+            {errors.yearBuiltMax && <div className="text-danger" style={{ fontSize: '0.75rem', marginTop: '0.5rem' }}>{errors.yearBuiltMax}</div>}
+
           </div>
         </div>
       </li>
