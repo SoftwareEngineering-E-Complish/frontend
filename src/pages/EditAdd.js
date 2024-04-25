@@ -7,7 +7,7 @@ import CloseIcon from '@mui/icons-material/Close';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import axiosInstance from '../api/axiosInstance';
 import { useLocation } from 'react-router-dom';
-
+import { useNavigate } from 'react-router-dom';
 
 const useMediaQuery = (query) => {
   const [matches, setMatches] = useState(window.matchMedia(query).matches);
@@ -22,29 +22,20 @@ const useMediaQuery = (query) => {
 };
 
 function EditAdd({ newCreated }) {
+  const navigate = useNavigate();
   const location = useLocation();
   const property = location.state.property;
-  console.log(property);
-  console.log(property.title)
-
-  // Now you can use the property object
-
-  const [formState, setFormState] = useState({
-    title: '',
-    property_type: '',
-    price: '',
-    square_meters: '',
-    bathrooms: '',
-    bedrooms: '',
-    location: '',
-    address: '',
-    year_built: '',
-    description: '',
-    images: [],
-  });
+  const [images, setImages] = useState([]);
+  const [error, setError] = useState('');
+  const isSmallScreen = useMediaQuery('(max-width: 600px)');
+  const fieldWidth = isSmallScreen ? '90%' : '45%';
+  const verticalPadding = 2
+  const [formState, setFormState] = useState({});
+  const [formValid, setFormValid] = useState(false);
 
   useEffect(() => {
     if (property) {
+      console.log(property);
       setFormState({
         title: property.title || '',
         property_type: property.property_type || '',
@@ -60,22 +51,14 @@ function EditAdd({ newCreated }) {
       });
     }
   }, [property]);
-  const [images, setImages] = useState([]);
-  const [error, setError] = useState('');
-  const isSmallScreen = useMediaQuery('(max-width: 600px)');
-  const fieldWidth = isSmallScreen ? '90%' : '45%';
-  const verticalPadding = 2
-
 
   const handleChangeDropdown = (name, event) => {
     const value = event.target.value;
-
     setFormState((prevState) => ({
       ...prevState,
       [name]: value,
     }));
   };
-
 
   const handleChange = (event) => {
     const { name, value } = event.target;
@@ -101,6 +84,19 @@ function EditAdd({ newCreated }) {
     };
   };
 
+  const isFormValid = () => {
+    for (let key in formState) {
+      if (formState[key] === '') {
+        return false;
+      }
+    }
+    return true;
+  };
+
+  useEffect(() => {
+    setFormValid(isFormValid());
+  }, [formState]);
+
   const handleSubmit = async (event) => {
     event.preventDefault();
     const newState = await convertImagesToBlobs(images);
@@ -122,12 +118,22 @@ function EditAdd({ newCreated }) {
         setError('Error creating new ad');
       }
     }
-    else {
+    if (property) {
+      console.log('hello')
       try {
-        await axiosInstance.post('/updateProperty', { 'content': newState });
+        const formData = new FormData();
+        const propertyId = property.propertyId;
+        formData.append('content', JSON.stringify(newState));
+        console.log(formData)
+        await axiosInstance.put('/updateProperty/' + propertyId, formData, {
+          headers: {
+            'Content-Type': 'application/json', 
+          },
+        });
         setError('success');
+        navigate('/profile');
       } catch (error) {
-        setError('Error updating new ad');
+        setError('Update Add');
       }
     }
   };
@@ -158,6 +164,7 @@ function EditAdd({ newCreated }) {
     setImages(items);
   };
 
+
   const isFirstImage = (index) => index === 0;
 
   return (
@@ -186,10 +193,12 @@ function EditAdd({ newCreated }) {
         <TextField label="City" name="location" value={formState.location} onChange={handleChange} sx={{ mb: verticalPadding, width: fieldWidth }} />
         <TextField label="Address" name="address" value={formState.address} onChange={handleChange} sx={{ mb: verticalPadding, width: fieldWidth }} />
         <TextField label="Description" name="description" value={formState.description} multiline rows={4} onChange={handleChange} sx={{ mb: verticalPadding, width: fieldWidth }} />
-
+        {!property && 
         <Button variant="contained" component="label" onClick={handleButtonClick}>
           Upload Images
         </Button>
+        }
+        {!property && 
         <div sx={{ mb: verticalPadding, width: fieldWidth }}>
           <DragDropContext onDragEnd={handleOnDragEnd}>
             <Droppable droppableId="image-grid">
@@ -247,7 +256,8 @@ function EditAdd({ newCreated }) {
             </Droppable>
           </DragDropContext>
         </div>
-        <Button type="submit" variant="contained" sx={{ mt: 7 }} color="primary" onClick={handleSubmit}>Publish Listing</Button>
+        }
+        <Button type="submit" variant="contained" sx={{ mt: 7 }} color="primary" onClick={handleSubmit} disabled={!formValid}> {property ? 'Update Property' : 'Create Property'}</Button>
       </Box>
       {error && (
         <Box sx={{ mt: 2 }}>

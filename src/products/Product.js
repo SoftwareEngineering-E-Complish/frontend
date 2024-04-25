@@ -14,7 +14,7 @@ function Product({ product }) {
   return (
     <div className="col">
       <div className="card shadow-sm rounded-corners-card">
-        <Link to={window.location.pathname === '/profile' ? `/editAdd` : `/properties/${property.propertyId}`}
+        <Link to={window.location.pathname === '/profile' ? `/createAdd` : `/properties/${property.propertyId}`}
           state={{ property }}
           replace
         >
