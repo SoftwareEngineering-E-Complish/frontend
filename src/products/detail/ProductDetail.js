@@ -68,7 +68,7 @@ function ProductDetail() {
   const checkInterestStatus = async () => {
     try {
 
-      const response = await axios.get(`http://localhost:7200/fetchInterestsByUser?userId=${encodeURIComponent(userId)}`);
+      const response = await axios.get(`http://localhost:8004/fetchInterestsByUser?userId=${encodeURIComponent(userId)}`);
       const interests = response.data;
 
       const isInterested = interests.some(interest => interest.propertyId === Number(id));
@@ -90,7 +90,7 @@ function ProductDetail() {
     }
     if (!isInterested) {
       try {
-        await axios.post('http://localhost:7200/declareInterest', {
+        await axios.post('http://localhost:8004/declareInterest', {
           propertyId: Number(id),
           userId: userId,
           timestamp: timestamp
@@ -102,7 +102,7 @@ function ProductDetail() {
       }
     } else {
       try {
-        await axios.delete('http://localhost:7200/removeInterest', {
+        await axios.delete('http://localhost:8004/removeInterest', {
           data: { propertyId: Number(id), userId: userId }
         });
         setIsInterested(false);
