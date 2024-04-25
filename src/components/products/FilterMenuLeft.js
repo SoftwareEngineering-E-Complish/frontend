@@ -11,7 +11,7 @@ const categories = [
 
 function FilterMenuLeft() {
 
-  const { formValues, handleInputChange, handleApplyFilters, setSearchResults, setQueryInfo } = useSearch();
+  const { formValues, handleInputChange, setSearchResults, setQueryInfo } = useSearch();
   const [activePropertyTypeButtons, setActivePropertyTypeButtons] = useState([]);
   const [localFormValues, setLocalFormValues] = useState(formValues);
   const [errors, setErrors] = useState({});
@@ -24,8 +24,8 @@ function FilterMenuLeft() {
     const { name, value } = event.target;
     const updatedFormValues = { ...localFormValues, [name]: value };
 
-    setLocalFormValues(updatedFormValues); 
-    validateInput(name, value, updatedFormValues); 
+    setLocalFormValues(updatedFormValues);
+    validateInput(name, value, updatedFormValues);
   };
 
   const validateInput = (name, value, updatedFormValues) => {
@@ -41,7 +41,7 @@ function FilterMenuLeft() {
     };
 
     const relatedKey = validationPairs[name];
-    let newErrors = {...errors};
+    let newErrors = { ...errors };
 
     if (relatedKey) {
       const minKey = name.includes('Min') ? name : relatedKey;
@@ -86,6 +86,8 @@ function FilterMenuLeft() {
       console.error(error);
     }
   };
+
+
   return (
     <ul className="list-group list-group-flush rounded">
       <li className="list-group-item d-none d-lg-block">
