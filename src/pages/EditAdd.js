@@ -112,7 +112,14 @@ function EditAdd() {
   };
 
   useEffect(() => {
-    setFormValid(isFormValid());
+    let isValid = true;
+    for (let key in formState) {
+      if (key !== 'images' && formState[key] === '') {
+        isValid = false;
+        break;
+      }
+    }
+    setFormValid(isValid);
   }, [formState]);
 
   const handleSubmit = async(event) => {
@@ -238,7 +245,7 @@ function EditAdd() {
         </Box>
         }
         <Box sx={{ display: 'flex', flexDirection: 'column',alignItems:"center", py:1}}>
-        {formState.property_type &&
+        {formState.property_type | !property &&
         <FormControl sx={{ mb: verticalPadding, width:fieldWidth, alignContent:'center'}}>
         <InputLabel id="select_property_type">Type of property</InputLabel>
         
