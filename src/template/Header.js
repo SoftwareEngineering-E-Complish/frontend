@@ -81,7 +81,7 @@ function Header() {
     };
     checkToken();
     const handleStorageChange = (event) => {
-    
+
       checkToken();
     };
 
@@ -90,18 +90,14 @@ function Header() {
 
   }, []);
 
-  
+
   return (
     <header>
       <nav className="navbar fixed-top navbar-expand-lg navbar-light bg-white border-bottom ">
         <div className="container-fluid">
           <Link className="navbar-brand" to="/" onClick={changeNav}>
-            <FontAwesomeIcon
-              icon={["fab", "bootstrap"]}
-              className="ms-1"
-              size="lg"
-            />
-            <span className="ms-2 h5">BinaRentalApp</span>
+            <img src={require("../assets/logo/ecomplishLogo.png")} height={"60px"} width={"60px"} />
+            <span className="ms-2 h5">E-Complish</span>
           </Link>
           <Link className="navbar-brand" to="/addEditor" onClick={changeNav}>
             <span className="ms-2 h7">Create New Add</span>

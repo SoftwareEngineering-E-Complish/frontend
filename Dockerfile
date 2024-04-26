@@ -13,6 +13,10 @@ RUN npm install
 # Copy the entire application code to the container
 COPY . .
 
+# Pass the environment variable value during the build phase
+ARG REACT_APP_GOOGLE_MAPS_API_KEY
+ENV REACT_APP_GOOGLE_MAPS_API_KEY=$REACT_APP_GOOGLE_MAPS_API_KEY
+
 # Build the React app for production
 RUN npm run build
 
