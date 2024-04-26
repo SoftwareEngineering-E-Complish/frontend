@@ -99,7 +99,7 @@ function Header() {
             <img src={require("../assets/logo/ecomplishLogo.png")} height={"60px"} width={"60px"} />
             <span className="ms-2 h5">E-Complish</span>
           </Link>
-          <Link className="navbar-brand" to="/createAdd" onClick={changeNav}>
+          <Link className="navbar-brand" to="/addEditor" onClick={changeNav}>
             <span className="ms-2 h7">Create New Add</span>
           </Link>
           <div className={"navbar-collapse offcanvas-collapse " + (openedDrawer ? 'open' : '')}>

@@ -40,7 +40,7 @@ function SimpleProductList({ propertyIds }) {
     return (
         <div className="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
             {properties.map(property => (
-                <Product key={property.propertyId} product={property} />
+                <Product key={property.propertyId} product={property} ownProperty={false}/>
             ))}
         </div>
     );

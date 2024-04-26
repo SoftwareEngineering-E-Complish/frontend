@@ -108,11 +108,11 @@ function ProductResultsBody({ properties }) {
                     {properties.map((property, i) => {
                         if (viewType.grid) {
                             return (
-                                <Product key={property.propertyId} product={property} />
+                                <Product key={property.propertyId} product={property} ownProperty={true} />
                             );
                         }
                         return (
-                            <ProductH key={property.propertyId} product={property} />
+                            <ProductH key={property.propertyId} product={property}/>
                         );
                     })}
                 </div>)
