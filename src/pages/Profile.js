@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import ProductListBody from '../components/products/ProductListBody';
+import ProductResultsBody from '../components/products/ProductResultsBody';
 import SimpleProductList from '../components/products/SimpleProductList';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useNavigate } from 'react-router-dom';
@@ -50,7 +50,8 @@ function ProfilePage() {
     useEffect(() => {
         async function getUserProperties(username) {
             try {
-                let response = await axiosInstance.get(`/fetchPropertiesByUser`, { params: { userId: username /*accessToken: accessToken*/ } });
+                let response = await axiosInstance.get(`/fetchPropertiesByUser`, { params: { userId: username } });
+
                 setUserProperties(response.data);
             } catch (error) {
                 console.error('Error fetching user properties:', error);
@@ -59,7 +60,7 @@ function ProfilePage() {
         async function getUserInterests(userId) {
             try {
                 //let response = await axiosInstance.get(`/fetchInterestsByUser`, { params: { userId: username /*accessToken: accessToken*/ } });
-                const response = await axios.get(`http://localhost:7200/fetchInterestsByUser?userId=${encodeURIComponent(userId)}`);
+                const response = await axios.get(`http://localhost:8004/fetchInterestsByUser?userId=${encodeURIComponent(userId)}`);
                 const interestIds = response.data.map(interest => interest.propertyId);
                 setUserInterests(interestIds);
             } catch (error) {
@@ -125,7 +126,7 @@ function ProfilePage() {
                         <div className="card mb-3">
                             <h4 className="card-header">Your Properties</h4>
                             <div className="card-body">
-                                <ProductListBody products={userProperties} />
+                                <ProductResultsBody properties={userProperties} />
                             </div>
                         </div>
                     </div>

@@ -1,38 +1,65 @@
 import RelatedProduct from "./RelatedProduct";
 import Ratings from "react-ratings-declarative";
-import { Link, useParams , useLocation} from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import ScrollToTopOnMount from "../../template/ScrollToTopOnMount";
-import { housesData } from'../../mockdata';
+import { housesData } from '../../mockdata';
 import { useSearch } from '../../SearchContext';
+import getPropertySecondaryImages from "../../api/queries";
 import axios from 'axios';
 import React, { useState, useEffect } from 'react';
 import { jwtDecode } from 'jwt-decode';
+import axiosInstance from '../../api/axiosInstance';
 
 const iconPath =
   "M18.571 7.221c0 0.201-0.145 0.391-0.29 0.536l-4.051 3.951 0.96 5.58c0.011 0.078 0.011 0.145 0.011 0.223 0 0.29-0.134 0.558-0.458 0.558-0.156 0-0.313-0.056-0.446-0.134l-5.011-2.634-5.011 2.634c-0.145 0.078-0.29 0.134-0.446 0.134-0.324 0-0.469-0.268-0.469-0.558 0-0.078 0.011-0.145 0.022-0.223l0.96-5.58-4.063-3.951c-0.134-0.145-0.279-0.335-0.279-0.536 0-0.335 0.346-0.469 0.625-0.513l5.603-0.815 2.511-5.078c0.1-0.212 0.29-0.458 0.547-0.458s0.446 0.246 0.547 0.458l2.511 5.078 5.603 0.815c0.268 0.045 0.625 0.179 0.625 0.513z";
 
 function ProductDetail() {
   let { id } = useParams();
-  const { searchResults } = useSearch();
-  const property = searchResults.find(p => p.propertyId === Number(id));
-// Loop through each item in the searchResults to log its propertyId value and type
+  const { searchResults, allProperties, setAllProperties } = useSearch();
+  const [property, setProperty] = useState(null);
+
   const [isInterested, setIsInterested] = useState(false);
   const [interestButtonText, setInterestButtonText] = useState("Declare Interest");
   const idToken = localStorage.getItem('idToken');
-  const decoded = jwtDecode(idToken);
-  const userId = decoded.sub;
-
-  searchResults.forEach(p => console.log(`Value: ${p.propertyId}, Type: ${typeof p.propertyId}`));
-
-// Log the target id value and its type
-  console.log(`Target ID: Value: ${id}, Type: ${typeof id}`);
-
-
-  //const location = useLocation();
-  //const { property } = location.state || {};
-  //const property = housesData.find(house => house.propertyId === Number(id));
+  let userId = '';
+  if (idToken && idToken !== '') {
+    const decoded = jwtDecode(idToken);
+    userId = decoded.sub;
+  }
   const agent = housesData[0].agent;
-  const image = housesData[1].imageLg;
+  const image = property?.primaryImage ?? housesData[1].imageLg;
+  const [secondaryImages, setSecondaryImages] = useState([]);
+
+  useEffect(() => {
+    const fetchSecondaryImages = async () => {
+      try {
+        const images = await getPropertySecondaryImages(property.propertyId);
+        setSecondaryImages(images);
+      } catch (error) {
+        console.error('Error fetching secondary images:', error);
+      }
+      
+    };
+
+
+    fetchSecondaryImages();
+
+    const fetchProperty = async () => {
+      var prop = await searchResults.find(p => p.propertyId === Number(id));
+      if (prop === undefined){
+        const response = await axios.get(`http://localhost:8004/properties/${id}`); 
+        prop = response.data;
+      }
+      setProperty(prop);
+    }
+    fetchProperty();
+  
+    
+
+  }, [id]);
+
+
+
 
   useEffect(() => {
     checkInterestStatus();
@@ -40,13 +67,12 @@ function ProductDetail() {
 
   const checkInterestStatus = async () => {
     try {
-    
-      const response = await axios.get(`http://localhost:7200/fetchInterestsByUser?userId=${encodeURIComponent(userId)}`);
-      const interests = response.data; 
+
+      const response = await axios.get(`http://localhost:8004/fetchInterestsByUser?userId=${encodeURIComponent(userId)}`);
+      const interests = response.data;
 
       const isInterested = interests.some(interest => interest.propertyId === Number(id));
       setIsInterested(isInterested);
-      console.log('Interest Check:', isInterested); 
       setInterestButtonText(isInterested ? "Remove Interest" : "Declare Interest");
     } catch (error) {
       console.error('Failed to fetch interest status:', error);
@@ -58,10 +84,13 @@ function ProductDetail() {
 
   const handleInterest = async () => {
     const timestamp = new Date().toISOString();
-
+    if(!localStorage.getItem('accessToken')){
+      const response = await axiosInstance.get("/loginURL");
+      window.location.replace(response.data);
+    }
     if (!isInterested) {
       try {
-        await axios.post('http://localhost:7200/declareInterest', {
+        await axios.post('http://localhost:8004/declareInterest', {
           propertyId: Number(id),
           userId: userId,
           timestamp: timestamp
@@ -73,7 +102,7 @@ function ProductDetail() {
       }
     } else {
       try {
-        await axios.delete('http://localhost:7200/removeInterest', {
+        await axios.delete('http://localhost:8004/removeInterest', {
           data: { propertyId: Number(id), userId: userId }
         });
         setIsInterested(false);
@@ -84,9 +113,12 @@ function ProductDetail() {
     }
   };
 
+  if (!property) return <div className="spinner text-center">Loading...</div>;
+
+
   return (
     <div className="container mt-5 py-4 px-xl-5">
-      <ScrollToTopOnMount/>
+      <ScrollToTopOnMount />
       <nav aria-label="breadcrumb" className="bg-custom-light rounded mb-4">
         <ol className="breadcrumb p-3">
           <li className="breadcrumb-item">
@@ -108,14 +140,18 @@ function ProductDetail() {
         <div className="d-none d-lg-block col-lg-1">
           <div className="image-vertical-scroller">
             <div className="d-flex flex-column">
-              {Array.from({ length: 10 }, (_, i) => {
+              {secondaryImages?.map((secondaryImage, i) => {
                 let selected = i !== 1 ? "opacity-6" : "";
                 return (
                   <a key={i} href="">
                     <img
                       className={"rounded mb-2 ratio " + selected}
                       alt=""
-                      src={image}
+                      src={secondaryImage ?? image}
+                      onError={(e) => {
+                        e.target.onerror = null;
+                        e.target.src = housesData[1].image;
+                      }}
                     />
                   </a>
                 );
@@ -130,11 +166,15 @@ function ProductDetail() {
                 className="border rounded ratio ratio-1x1"
                 alt=""
                 src={image}
+                onError={(e) => {
+                  e.target.onerror = null;
+                  e.target.src = housesData[1].imageLg;
+                }}
               />
             </div>
           </div>
 
-          
+
         </div>
 
         <div className="col-lg-5">
@@ -145,12 +185,12 @@ function ProductDetail() {
             <div className="row g-3 mb-4">
               <div className="col">
                 <button className="btn btn-outline-dark py-2 w-100" onClick={handleInterest}>
-                {interestButtonText}
+                  {interestButtonText}
                 </button>
               </div>
               <div className="col">
-                <Link to={{ pathname: "/profile" }} state={{agent: agent }} className="btn btn-dark py-2 w-100">View profile</Link>
-            </div>
+                <Link to={{ pathname: "/profile" }} state={{ agent: agent }} className="btn btn-dark py-2 w-100">View profile</Link>
+              </div>
             </div>
 
             <h4 className="mb-0">Details</h4>
@@ -218,7 +258,7 @@ function ProductDetail() {
           <div className="row row-cols-1 row-cols-md-3 row-cols-lg-4 g-3">
             {Array.from({ length: 4 }, (_, i) => {
               return (
-                <RelatedProduct key={i} index={i}/>
+                <RelatedProduct key={i} index={i} />
               );
             })}
           </div>

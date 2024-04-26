@@ -9,6 +9,18 @@ function Header() {
   const [loggedIn, setLoggedIn] = useState(false);
   let profileField = (<div></div>);
 
+  const [shouldReload, setShouldReload] = useState(false);
+
+  const reloadPageAndNav = () => {
+    setShouldReload(true);
+  };
+
+  useEffect(() => {
+    if (shouldReload) {
+      window.location.reload();
+    }
+  }, [shouldReload]);
+
   function toggleDrawer() {
     setOpenedDrawer(!openedDrawer);
   }
@@ -22,7 +34,6 @@ function Header() {
     event.preventDefault();
     try {
       const response = await axiosInstance.get("/signupURL");
-      console.log("Signup URL: " + response.data);
 
       //setSearchResults(searchResults); // Set search results in global state
       window.location.replace(response.data);
@@ -35,7 +46,6 @@ function Header() {
     event.preventDefault();
     try {
       const response = await axiosInstance.get("/loginURL");
-      console.log("Login URL: " + response.data);
       //setSearchResults(searchResults); // Set search results in global state
       window.location.replace(response.data);
     } catch (error) {
@@ -79,12 +89,11 @@ function Header() {
   useEffect(() => {
     const checkToken = () => {
       const token = localStorage.getItem('accessToken');
-      console.log(token);
       setLoggedIn(!!token);
     };
     checkToken();
     const handleStorageChange = (event) => {
-      console.log("Local Storage Change Detected:", event.detail);
+
       checkToken();
     };
 
@@ -93,20 +102,16 @@ function Header() {
 
   }, []);
 
-  console.log("logged in: " + loggedIn);
+
   return (
     <header>
       <nav className="navbar fixed-top navbar-expand-lg navbar-light bg-white border-bottom ">
         <div className="container-fluid">
           <Link className="navbar-brand" to="/" onClick={changeNav}>
-            <FontAwesomeIcon
-              icon={["fab", "bootstrap"]}
-              className="ms-1"
-              size="lg"
-            />
-            <span className="ms-2 h5">BinaRentalApp</span>
+            <img src={require("../assets/logo/ecomplishLogo.png")} height={"60px"} width={"60px"} />
+            <span className="ms-2 h5">E-Complish</span>
           </Link>
-          <Link className="navbar-brand" to="/createAdd" onClick={changeNav}>
+          <Link className="navbar-brand" to="/editAdd" onClick={reloadPageAndNav} >
             <span className="ms-2 h7">Create New Add</span>
           </Link>
           <div className={"navbar-collapse offcanvas-collapse " + (openedDrawer ? 'open' : '')}>

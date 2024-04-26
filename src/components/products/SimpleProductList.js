@@ -17,7 +17,7 @@ function SimpleProductList({ propertyIds }) {
             setLoading(true);
             try {
                 const propertyDetails = await Promise.all(propertyIds.map(id =>
-                    axios.get(`http://localhost:7200/propetries/${id}`).then(res => res.data)
+                    axios.get(`http://localhost:8004/properties/${id}`).then(res => res.data)
                 ));
                 setProperties(propertyDetails);
                 setError('');  // Clear any previous errors if fetch is successful
@@ -40,7 +40,7 @@ function SimpleProductList({ propertyIds }) {
     return (
         <div className="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
             {properties.map(property => (
-                <Product key={property.propertyId} product={property} />
+                <Product key={property.propertyId} product={property} ownProperty={false}/>
             ))}
         </div>
     );
