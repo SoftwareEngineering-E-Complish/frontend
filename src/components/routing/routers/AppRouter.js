@@ -6,7 +6,6 @@ import ProductList from "../../../products/ProductList";
 import Login from "../../../pages/Login";
 import Register from "../../../pages/Register";
 import Profile from "../../../pages/Profile";
-import AddPage from "../../../pages/EditAdd.js";
 import Callback from "../../../pages/Callback";
 import { LoggedInGuard } from "../routeProtectors/ProfileGuard.js";
 import EditAdd from "../../../pages/EditAdd";
@@ -28,10 +27,6 @@ const AppRouter = () => {
       </Route>
       <Route path="/editAdd" element={<LoggedInGuard />}>
         <Route path="/editAdd" element={<EditAdd />} />
-      </Route>
-      <Route path="/addEditor" element={<LoggedInGuard />}>
-        <Route path="/addEditor" element={<AddPage  />}>
-        </Route>
       </Route>
       <Route path="/" element={<Landing />}>
       </Route>
