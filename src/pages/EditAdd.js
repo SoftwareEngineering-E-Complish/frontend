@@ -1,13 +1,14 @@
 import React, { useState } from 'react';
 import { Box } from '@mui/material';
-import { FormControl, InputLabel, TextField, Select, MenuItem } from '@mui/material';
+import { FormControl, InputLabel, TextField,Select,MenuItem} from '@mui/material';
 import { useEffect } from 'react';
-import { Button, Grid, Typography, IconButton, Paper } from '@mui/material';
+import { Button, Grid, Typography,IconButton, Paper,  List, ListItem, ListItemText } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import axiosInstance from '../api/axiosInstance';
-import { useLocation } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
+import axios from 'axios';
 
 const useMediaQuery = (query) => {
   const [matches, setMatches] = useState(window.matchMedia(query).matches);
@@ -21,44 +22,61 @@ const useMediaQuery = (query) => {
   return matches;
 };
 
-function EditAdd({ newCreated }) {
+function EditAdd() { 
   const navigate = useNavigate();
   const location = useLocation();
-  const property = location.state.property;
+  const property = location.state ? location.state.property : null;
   const [images, setImages] = useState([]);
   const [error, setError] = useState('');
   const isSmallScreen = useMediaQuery('(max-width: 600px)');
   const fieldWidth = isSmallScreen ? '90%' : '45%';
   const verticalPadding = 2
-  const [formState, setFormState] = useState({});
+  const [formState, setFormState] = useState({
+    title: '',
+    property_type: '',
+    price: '',
+    square_meters: '',
+    bathrooms: '',
+    bedrooms: '',
+    location: '',
+    address: '',
+    year_built: '',
+    description: '',
+    images: [],
+  });
   const [formValid, setFormValid] = useState(false);
+  const [errors, setErrors] = useState({});
+  const [usersInterested, setUsersInterested] = useState([]);
+
 
   useEffect(() => {
     if (property) {
-      console.log(property);
+      fetchInterestedUsers(property.propertyId);
       setFormState({
-        title: property.title || '',
-        property_type: property.property_type || '',
-        price: property.price || '',
-        square_meters: property.square_meters || '',
-        bathrooms: property.bathrooms || '',
-        bedrooms: property.bedrooms || '',
-        location: property.location || '',
-        address: property.address || '',
-        year_built: property.year_built || '',
-        description: property.description || '',
+        title: property.title ,
+        property_type: property.property_type ,
+        price: property.price ,
+        square_meters: property.square_meters ,
+        bathrooms: property.bathrooms ,
+        bedrooms: property.bedrooms ,
+        location: property.location ,
+        address: property.address ,
+        year_built: property.year_built ,
+        description: property.description ,
         images: property.images || [],
       });
-    }
+    } 
   }, [property]);
 
   const handleChangeDropdown = (name, event) => {
     const value = event.target.value;
+  
     setFormState((prevState) => ({
       ...prevState,
       [name]: value,
     }));
   };
+
 
   const handleChange = (event) => {
     const { name, value } = event.target;
@@ -66,9 +84,10 @@ function EditAdd({ newCreated }) {
       ...formState,
       [name]: value,
     });
+    validateField(name, value);
   };
-
-
+  
+  
   const convertImagesToBlobs = async (images) => {
     const blobPromises = images.map((image) =>
       fetch(image)
@@ -83,7 +102,6 @@ function EditAdd({ newCreated }) {
       images: blobImages,
     };
   };
-
   const isFormValid = () => {
     for (let key in formState) {
       if (formState[key] === '') {
@@ -97,43 +115,37 @@ function EditAdd({ newCreated }) {
     setFormValid(isFormValid());
   }, [formState]);
 
-  const handleSubmit = async (event) => {
+  const handleSubmit = async(event) => {
     event.preventDefault();
     const newState = await convertImagesToBlobs(images);
-    console.log(newState);
-    if (newCreated) {
+    if (!property) {
       try {
-        const formData = new FormData();
-        formData.append('content', JSON.stringify(newState));
-        for (let i = 0; i < newState.images.length; i++) {
-          formData.append('images', newState.images[i]);
-        }
-        await axiosInstance.post('/createProperty', formData, {
-          headers: {
-            'Content-Type': 'multipart/form-data',
-          },
-        });
-        setError('success');
+      const formData = new FormData();
+      formData.append('content', JSON.stringify(newState));
+      for (let i = 0; i < newState.images.length; i++) {
+        formData.append('images', newState.images[i]);
+      }
+      await axiosInstance.post('/createProperty', formData, {
+        headers: {
+        'Content-Type': 'multipart/form-data',
+        },
+      });
+      setError('success');
+      navigate('/profile');
       } catch (error) {
-        setError('Error creating new ad');
+      setError('Error creating new ad');
       }
     }
-    if (property) {
-      console.log('hello')
+    else {
       try {
         const formData = new FormData();
         const propertyId = property.propertyId;
-        formData.append('content', JSON.stringify(newState));
-        console.log(formData)
-        await axiosInstance.put('/updateProperty/' + propertyId, formData, {
-          headers: {
-            'Content-Type': 'application/json', 
-          },
-        });
-        setError('success');
+        formData.append('content', JSON.stringify(formState));
+        await axiosInstance.put('/updateProperty/' + propertyId, {'content': formState});
         navigate('/profile');
       } catch (error) {
-        setError('Update Add');
+        console.log(error);
+        navigate('/profile');
       }
     }
   };
@@ -156,6 +168,36 @@ function EditAdd({ newCreated }) {
     setImages(images.filter((_, i) => i !== index));
   };
 
+  const validateField = (name, value) => {
+    if (value.trim() === '') {
+      setErrors((prevErrors) => ({
+        ...prevErrors,
+        [name]: `The ${name} field is required`,
+      }));
+    } else {
+      setErrors((prevErrors) => ({
+        ...prevErrors,
+        [name]: '',
+      }));
+    }
+  };
+  
+  useEffect(() => {
+    if (formState.property_type) {
+      handleChangeDropdown('property_type', { target: { value: formState.property_type } });
+    }
+  }, [formState.property_type]);
+
+  const fetchInterestedUsers = async (propertyId) => {
+    try {
+      //let response = await axiosInstance.get(`/fetchInterestsByUser`, { params: { userId: username /*accessToken: accessToken*/ } });
+      const response = await axios.get(`http://localhost:8004/fetchInterestsByProperty?propertyId=${encodeURIComponent(propertyId)}`);
+      const interestUsers = response.data.map(interest => interest.propertyId);
+      setUsersInterested(interestUsers);
+  } catch (error) {
+      console.error('Error fetching users interested:', error);
+  }  };
+
   const handleOnDragEnd = (result) => {
     if (!result.destination) return;
     const items = Array.from(images);
@@ -164,36 +206,65 @@ function EditAdd({ newCreated }) {
     setImages(items);
   };
 
-
   const isFirstImage = (index) => index === 0;
 
   return (
-    <form onSubmit={handleSubmit}>
-      <Typography variant="h4" align="center" sx={{ mb: 4, py: 1 }}>Update Ad</Typography>
-      <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: "center", py: 1 }}>
-        <TextField label="Title" name="title" value={formState.title} onChange={handleChange} sx={{ mb: verticalPadding, width: fieldWidth, alignContent: 'center' }} />
-        <FormControl sx={{ mb: verticalPadding, width: fieldWidth, alignContent: 'center' }}>
-          <InputLabel id="select_property_type">Type of property</InputLabel>
-          <Select
-            labelId="select_property_type-label"
-            id="select_property_type-select"
-            value={formState.property_type}
-            label="property_type"
+    <form onSubmit={handleSubmit} sx={{ backgroundColor: 'white' }}>
+        <Typography variant="h4" align="center" sx={{ mb: 4 ,py:1}}>{property ? 'Update Property' : 'Create Property'}</Typography>
+        {property &&
+        <Box sx={{ display: 'flex', flexDirection: 'column',alignItems:"center", py:1}}>
+        <Grid container spacing={2} direction={isSmallScreen ? 'column' : 'row'} alignItems="center" justifyContent="center" sx={{ mb: 4, width: fieldWidth }}>
+          <Grid item xs={12} md={6}>
+            <Typography variant="h6" align="center" sx={{ mb: 4, py: 2 }}>
+              Number of interested users: {usersInterested.length}
+            </Typography>
+          </Grid>
+          <Grid item xs={12} md={6}>
+            <Box sx={{ mb: verticalPadding, width: '100%', margin: 'auto', border: '1px solid #000', overflow: 'auto', maxHeight: 200, py: 2 }}>
+              {usersInterested.length > 0 ? (
+                usersInterested.map((user, index) => (
+                  <ListItem key={index}>
+                    <ListItemText primary={`Username ${index + 1}: ${user}`}  />
+                  </ListItem>
+                ))
+              ) : (
+                <ListItem>
+                  <ListItemText primary="No users are currently interested in this property." />
+                </ListItem>
+              )}
+            </Box>
+          </Grid>
+        </Grid>
+        </Box>
+        }
+        <Box sx={{ display: 'flex', flexDirection: 'column',alignItems:"center", py:1}}>
+        {formState.property_type &&
+        <FormControl sx={{ mb: verticalPadding, width:fieldWidth, alignContent:'center'}}>
+        <InputLabel id="select_property_type">Type of property</InputLabel>
+        
+        <Select
+          error={formState.property_type === ''}
+          labelId="select_property_type-label"
+          id="select_property_type-select"
+          value={formState.property_type}
+          label="property_type"
             onChange={(event) => handleChangeDropdown('property_type', event)}
-          >
-            <MenuItem value={'House'}>House</MenuItem>
-            <MenuItem value={'Apartment'}>Apartment</MenuItem>
-          </Select>
+            >
+          <MenuItem value={'House'}>House</MenuItem>
+          <MenuItem value={'Apartment'}>Apartment</MenuItem>
+        </Select>
         </FormControl>
-        <TextField label="Price in sfr" value={formState.price} name="price" type="number" onChange={handleChange} sx={{ mb: verticalPadding, width: fieldWidth }} />
-        <TextField label="Surface in m2" value={formState.square_meters} name="square_meters" type="number" onChange={handleChange} sx={{ mb: verticalPadding, width: fieldWidth }} />
-        <TextField label="Construction year" value={formState.year_built} name="year_built" type="number" onChange={handleChange} sx={{ mb: verticalPadding, width: fieldWidth }} />
-        <TextField label="Number of Bathrooms" value={formState.bathrooms} name="bathrooms" type="number" onChange={handleChange} sx={{ mb: verticalPadding, width: fieldWidth }} />
-        <TextField label="Number of Bedrooms" value={formState.bedrooms} name="bedrooms" type="number" onChange={handleChange} sx={{ mb: verticalPadding, width: fieldWidth }} />
-        <TextField label="City" name="location" value={formState.location} onChange={handleChange} sx={{ mb: verticalPadding, width: fieldWidth }} />
-        <TextField label="Address" name="address" value={formState.address} onChange={handleChange} sx={{ mb: verticalPadding, width: fieldWidth }} />
-        <TextField label="Description" name="description" value={formState.description} multiline rows={4} onChange={handleChange} sx={{ mb: verticalPadding, width: fieldWidth }} />
-        {!property && 
+        };
+        <TextField label="Title" name="title" error={formState.title == ''} value={formState.title} onChange={handleChange} sx={{ mb: verticalPadding, width: fieldWidth, alignContent: 'center' }} />
+        <TextField label="Price in sfr"  error={formState.price == ''} value={formState.price} name="price" type="number" onChange={handleChange} sx={{ mb: verticalPadding, width: fieldWidth }} />
+        <TextField label="Surface in m2" error={formState.square_meters == ''} value={formState.square_meters} name="square_meters" type="number" onChange={handleChange} sx={{ mb: verticalPadding, width: fieldWidth }} />
+        <TextField label="Construction year" error={formState.year_built == ''} value={formState.year_built} name="year_built" type="number" onChange={handleChange} sx={{ mb: verticalPadding, width: fieldWidth }} />
+        <TextField label="Number of Bathrooms" error={formState.bathrooms == ''} value={formState.bathrooms} name="bathrooms" type="number" onChange={handleChange} sx={{ mb: verticalPadding, width: fieldWidth }} />
+        <TextField label="Number of Bedrooms" error={formState.bedrooms == ''} value={formState.bedrooms} name="bedrooms" type="number" onChange={handleChange} sx={{ mb: verticalPadding, width: fieldWidth }} />
+        <TextField label="City" name="location" error={formState.location == ''} value={formState.location} onChange={handleChange} sx={{ mb: verticalPadding, width: fieldWidth }} />
+        <TextField label="Address" name="address" error={formState.address == ''} value={formState.address} onChange={handleChange} sx={{ mb: verticalPadding, width: fieldWidth }} />
+        <TextField label="Description" name="description" error={formState.description == ''} value={formState.description} multiline rows={4} onChange={handleChange} sx={{ mb: verticalPadding, width: fieldWidth }} />
+      {!property && 
         <Button variant="contained" component="label" onClick={handleButtonClick}>
           Upload Images
         </Button>
@@ -257,9 +328,9 @@ function EditAdd({ newCreated }) {
           </DragDropContext>
         </div>
         }
-        <Button type="submit" variant="contained" sx={{ mt: 7 }} color="primary" onClick={handleSubmit} disabled={!formValid}> {property ? 'Update Property' : 'Create Property'}</Button>
-      </Box>
-      {error && (
+        <Button type="submit" variant="contained" sx={{ mt: 7}} color="primary" disabled={!formValid} onClick={handleSubmit}>Publish Listing</Button>
+        </Box>
+        {error && (
         <Box sx={{ mt: 2 }}>
           <Typography color="error">{error}</Typography>
         </Box>

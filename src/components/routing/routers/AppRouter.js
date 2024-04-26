@@ -6,7 +6,7 @@ import ProductList from "../../../products/ProductList";
 import Login from "../../../pages/Login";
 import Register from "../../../pages/Register";
 import Profile from "../../../pages/Profile";
-import AddPage from "../../../pages/CreateAdd";
+import AddPage from "../../../pages/EditAdd.js";
 import Callback from "../../../pages/Callback";
 import { LoggedInGuard } from "../routeProtectors/ProfileGuard.js";
 import EditAdd from "../../../pages/EditAdd";
@@ -29,8 +29,8 @@ const AppRouter = () => {
       <Route path="/editAdd" element={<LoggedInGuard />}>
         <Route path="/editAdd" element={<EditAdd />} />
       </Route>
-      <Route path="/createAdd" element={<LoggedInGuard />}>
-        <Route path="/createAdd" element={<AddPage newCreated={true} />}>
+      <Route path="/addEditor" element={<LoggedInGuard />}>
+        <Route path="/addEditor" element={<AddPage  />}>
         </Route>
       </Route>
       <Route path="/" element={<Landing />}>

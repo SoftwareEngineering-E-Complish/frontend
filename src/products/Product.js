@@ -5,7 +5,7 @@ import { faMapMarkerAlt } from '@fortawesome/free-solid-svg-icons';
 import '../bootstrap-custom.css';
 import { housesData } from '../mockdata';
 
-function Product({ product }) {
+function Product({ product , ownProperty}) {
   const property = product;
   const image = product.primaryImage ?? housesData[1].image;
   const location = useLocation();
@@ -14,8 +14,8 @@ function Product({ product }) {
   return (
     <div className="col">
       <div className="card shadow-sm rounded-corners-card">
-        <Link to={window.location.pathname === '/profile' ? `/createAdd` : `/properties/${property.propertyId}`}
-          state={{ property }}
+        <Link to={window.location.pathname === '/profile' & ownProperty ? `/addEditor` : `/properties/${property.propertyId}`}
+          state={{ property}}
           replace
         >
           <img
