@@ -5,10 +5,12 @@ import ScrollToTopOnMount from "../../template/ScrollToTopOnMount";
 import { housesData } from '../../mockdata';
 import { useSearch } from '../../SearchContext';
 import getPropertySecondaryImages from "../../api/queries";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import axios from 'axios';
 import React, { useState, useEffect } from 'react';
 import { jwtDecode } from 'jwt-decode';
 import axiosInstance from '../../api/axiosInstance';
+import MapView from "../../components/map/Map";
 
 const iconPath =
   "M18.571 7.221c0 0.201-0.145 0.391-0.29 0.536l-4.051 3.951 0.96 5.58c0.011 0.078 0.011 0.145 0.011 0.223 0 0.29-0.134 0.558-0.458 0.558-0.156 0-0.313-0.056-0.446-0.134l-5.011-2.634-5.011 2.634c-0.145 0.078-0.29 0.134-0.446 0.134-0.324 0-0.469-0.268-0.469-0.558 0-0.078 0.011-0.145 0.022-0.223l0.96-5.58-4.063-3.951c-0.134-0.145-0.279-0.335-0.279-0.536 0-0.335 0.346-0.469 0.625-0.513l5.603-0.815 2.511-5.078c0.1-0.212 0.29-0.458 0.547-0.458s0.446 0.246 0.547 0.458l2.511 5.078 5.603 0.815c0.268 0.045 0.625 0.179 0.625 0.513z";
@@ -38,7 +40,7 @@ function ProductDetail() {
       } catch (error) {
         console.error('Error fetching secondary images:', error);
       }
-      
+
     };
 
 
@@ -46,15 +48,15 @@ function ProductDetail() {
 
     const fetchProperty = async () => {
       var prop = await searchResults.find(p => p.propertyId === Number(id));
-      if (prop === undefined){
-        const response = await axios.get(`http://localhost:8004/properties/${id}`); 
+      if (prop === undefined) {
+        const response = await axios.get(`http://localhost:8004/properties/${id}`);
         prop = response.data;
       }
       setProperty(prop);
     }
     fetchProperty();
-  
-    
+
+    console.log(property);
 
   }, [id]);
 
@@ -67,7 +69,6 @@ function ProductDetail() {
 
   const checkInterestStatus = async () => {
     try {
-
       const response = await axios.get(`http://localhost:8004/fetchInterestsByUser?userId=${encodeURIComponent(userId)}`);
       const interests = response.data;
 
@@ -84,7 +85,7 @@ function ProductDetail() {
 
   const handleInterest = async () => {
     const timestamp = new Date().toISOString();
-    if(!localStorage.getItem('accessToken')){
+    if (!localStorage.getItem('accessToken')) {
       const response = await axiosInstance.get("/loginURL");
       window.location.replace(response.data);
     }
@@ -251,6 +252,10 @@ function ProductDetail() {
         </div>
       </div>
 
+      <div className="h-25">
+        <MapView properties={[property]} />
+      </div>
+
       <div className="row">
         <div className="col-md-12 mb-4">
           <hr />
@@ -269,3 +274,4 @@ function ProductDetail() {
 }
 
 export default ProductDetail;
+

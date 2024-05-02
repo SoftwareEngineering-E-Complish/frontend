@@ -38,9 +38,7 @@ function ProductResultsBody({ properties }) {
             grid: !viewType.grid,
         });
     }
-    function toggleMapView() {
-        setShowMapView(!showMapView);
-    }
+
     if (!properties || properties.length == 0) return <div className="spinner text-center">No properties found</div>;
     return (
         <div className="d-flex flex-column h-100">
@@ -90,7 +88,7 @@ function ProductResultsBody({ properties }) {
                             icon={["fas", viewType.grid ? "th-list" : "th-large"]}
                         />
                     </button>
-                    <button className="btn btn-outline-dark ms-2 d-none d-lg-inline" onClick={toggleMapView}>
+                    <button className="btn btn-outline-dark ms-2 d-none d-lg-inline" onClick={() => setShowMapView(!showMapView)}>
                         <FontAwesomeIcon icon="fa-regular fa-map" />
                     </button>
                 </div>
@@ -112,7 +110,7 @@ function ProductResultsBody({ properties }) {
                             );
                         }
                         return (
-                            <ProductH key={property.propertyId} product={property}/>
+                            <ProductH key={property.propertyId} product={property} />
                         );
                     })}
                 </div>)
