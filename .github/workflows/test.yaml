@@ -1,0 +1,16 @@
+name: "Integration tests"
+on:
+  push:
+    branches:
+      - feature/tests
+
+jobs:
+  tests:
+    name: "Integration testing"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: "Set up environment and wait for docker to finish building"
+        run: docker compose -f docker-compose.yml up -d --wait
+      - name: "Test server"
+        run: docker exec -it frontend npm test
