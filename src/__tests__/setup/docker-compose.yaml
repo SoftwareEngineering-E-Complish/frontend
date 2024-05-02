@@ -62,15 +62,15 @@ services:
       - COGNITO_HOSTED_UI_BASE_URL=${COGNITO_HOSTED_UI_BASE_URL}
 
 
-  ################# FRONTEND #################
-  frontend:
-    build:
-      context: https://github.com/SoftwareEngineering-E-Complish/frontend.git#feature/tests
-      args:
-        REACT_APP_GOOGLE_MAPS_API_KEY: ${REACT_APP_GOOGLE_MAPS_API_KEY}
-    container_name: frontend
-    ports:
-      - "8000:80"
+  # ################# FRONTEND #################
+  # frontend:
+  #   build:
+  #     context: https://github.com/SoftwareEngineering-E-Complish/frontend.git#feature/tests
+  #     args:
+  #       REACT_APP_GOOGLE_MAPS_API_KEY: ${REACT_APP_GOOGLE_MAPS_API_KEY}
+  #   container_name: frontend
+  #   ports:
+  #     - "8000:80"
 
   ################# IMAGE SERVICE #################
   image-service:
