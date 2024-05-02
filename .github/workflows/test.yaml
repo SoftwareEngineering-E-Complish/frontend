@@ -13,6 +13,6 @@ jobs:
       - name: "Set up environment and wait for docker to finish building"
         run: docker compose -f ./src/__tests__/setup/docker-compose.yaml up -d --wait
       - name: "Test server"
-        run: npm test
+        run: npm install && npm test
       - name: "Tear down environment"
         run: docker compose -f ./src/__tests__/setup/docker-compose.yaml down
