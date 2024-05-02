@@ -41,7 +41,7 @@ function ProductResultsBody({ properties }) {
 
     if (!properties || properties.length == 0) return <div className="spinner text-center">No properties found</div>;
     return (
-        <div className="d-flex flex-column h-100">
+        <div className="d-flex flex-column h-100" id={"propertiesResultsBody"}>
             <div className="row mb-3">
                 <div className="col-lg-3 d-none d-lg-block">
                     <select
