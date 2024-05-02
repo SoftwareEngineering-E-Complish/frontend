@@ -11,6 +11,6 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - name: "Set up environment and wait for docker to finish building"
-        run: docker compose -f ./src/__tests__/docker-compose.yaml up -d --wait
+        run: docker compose -f ./src/__tests__/setup/docker-compose.yaml up -d --wait
       - name: "Test server"
         run: docker exec -it frontend npm test
