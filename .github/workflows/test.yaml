@@ -8,34 +8,34 @@ jobs:
   tests:
     name: "Integration testing"
     runs-on: ubuntu-latest
+    services:
+      # Define the Docker-compose service
+      docker:
+        # GitHub's Docker-in-Docker image
+        image: docker:19.03.12
+        options: --privileged
+        ports:
+          - 8000:8000  # Ensure that this port matches your frontend port
     steps:
       - uses: actions/checkout@v3
       - name: "Set up environment and wait for docker to finish building"
-        run: docker compose -f ./src/__tests__/setup/docker-compose.yaml up -d --wait
+        run: docker-compose -f ./src/__tests__/setup/docker-compose.yaml --project-name myproject up -d --build
       - name: "End to end tests"
         uses: cypress-io/github-action@v6
         with:
-          # build: npm run build
-          # start: npm run start
-          wait-on: "http://localhost:8000"
+          wait-on: "http://docker:8000" # Access the service using the Docker service alias
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-          
           USER_SERVICE_AWS_ACCESS_KEY_ID: ${{ secrets.USER_SERVICE_AWS_ACCESS_KEY_ID }}
           USER_SERVICE_AWS_SECRET_ACCESS_KEY: ${{ secrets.USER_SERVICE_AWS_SECRET_ACCESS_KEY }}
           USER_SERVICE_AWS_REGION: ${{ secrets.USER_SERVICE_AWS_REGION }}
-          
           COGNITO_CLIENT_ID: ${{ secrets.COGNITO_CLIENT_ID }}
           COGNITO_USER_POOL_ID: ${{ secrets.COGNITO_USER_POOL_ID }}
           COGNITO_HOSTED_UI_BASE_URL: ${{ secrets.COGNITO_HOSTED_UI_BASE_URL }}
-          
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
-          
           IMG_AWS_ACCESS_KEY_ID: ${{ secrets.IMG_AWS_ACCESS_KEY_ID }}
           IMG_AWS_SECRET_ACCESS_KEY: ${{ secrets.IMG_AWS_SECRET_ACCESS_KEY }}
-          
           REACT_APP_GOOGLE_MAPS_API_KEY: ${{ secrets.REACT_APP_GOOGLE_MAPS_API_KEY }}
-          
           GEOLOCATION_API_ACCESS_KEY: ${{ secrets.GEOLOCATION_API_ACCESS_KEY }}
       - name: "Tear down environment"
-        run: docker compose -f ./src/__tests__/setup/docker-compose.yaml down
+        run: docker-compose -f ./src/__tests__/setup/docker-compose.yaml --project-name myproject down
