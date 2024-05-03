@@ -11,7 +11,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - name: "Set up environment and wait for docker to finish building"
-        run: docker compose -f ./src/__tests__/setup/docker-compose.yaml up -d --wait
+        run: docker compose -f ./test-setup/docker-compose.yaml up -d --wait
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           
@@ -34,8 +34,6 @@ jobs:
       - name: "End to end tests"
         uses: cypress-io/github-action@v6
         with:
-          # build: npm run build
-          # start: npm run start
           wait-on: "http://localhost:8000"
       - name: "Tear down environment"
-        run: docker compose -f ./src/__tests__/setup/docker-compose.yaml down
+        run: docker compose -f ./test-setup/docker-compose.yaml down

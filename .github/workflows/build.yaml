@@ -19,3 +19,36 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Needed to get PR information, if any
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+
+  e2e-tests:
+    name: "End-to-end Testing"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: "Set up environment"
+        run: docker compose -f ./test-setup/docker-compose.yaml up -d --wait
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          
+          USER_SERVICE_AWS_ACCESS_KEY_ID: ${{ secrets.USER_SERVICE_AWS_ACCESS_KEY_ID }}
+          USER_SERVICE_AWS_SECRET_ACCESS_KEY: ${{ secrets.USER_SERVICE_AWS_SECRET_ACCESS_KEY }}
+          USER_SERVICE_AWS_REGION: ${{ secrets.USER_SERVICE_AWS_REGION }}
+          
+          COGNITO_CLIENT_ID: ${{ secrets.COGNITO_CLIENT_ID }}
+          COGNITO_USER_POOL_ID: ${{ secrets.COGNITO_USER_POOL_ID }}
+          COGNITO_HOSTED_UI_BASE_URL: ${{ secrets.COGNITO_HOSTED_UI_BASE_URL }}
+          
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          
+          IMG_AWS_ACCESS_KEY_ID: ${{ secrets.IMG_AWS_ACCESS_KEY_ID }}
+          IMG_AWS_SECRET_ACCESS_KEY: ${{ secrets.IMG_AWS_SECRET_ACCESS_KEY }}
+          
+          REACT_APP_GOOGLE_MAPS_API_KEY: ${{ secrets.REACT_APP_GOOGLE_MAPS_API_KEY }}
+          
+          GEOLOCATION_API_ACCESS_KEY: ${{ secrets.GEOLOCATION_API_ACCESS_KEY }}
+      - name: "Testing"
+        uses: cypress-io/github-action@v6
+        with:
+          wait-on: "http://localhost:8000"
+      - name: "Tear down environment"
+        run: docker compose -f ./test-setup/docker-compose.yaml down
