@@ -14,8 +14,8 @@ jobs:
         run: docker compose -f ./src/__tests__/setup/docker-compose.yaml up -d --wait
       - name: "End to end tests"
         uses: cypress-io/github-action@v6
-        # with:
-        #   build: npm run build
-        #   start: npm start
+        with:
+          # build: npm run build
+          wait-on: "http://localhost:8000"
       - name: "Tear down environment"
         run: docker compose -f ./src/__tests__/setup/docker-compose.yaml down
