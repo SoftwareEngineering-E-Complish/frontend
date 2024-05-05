@@ -20,7 +20,7 @@ function RelatedProduct(props) {
     const fetchProperty = async () => {
       var prop = await searchResults.find(p => p.propertyId === Number(id));
       if (prop === undefined){
-        const response = await axios.get(`http://localhost:8004/properties/${id}`); 
+        const response = await axios.get(`http://localhost/api/properties/${id}`); 
         prop = response.data;
       }
       setProperty(prop);

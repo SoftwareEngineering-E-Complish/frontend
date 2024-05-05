@@ -50,7 +50,7 @@ export const SearchProvider = ({ children }) => {
     }, {});
 
     try {
-      const response = await axiosInstance.get("http://localhost:8004/queryProperties", {
+      const response = await axiosInstance.get("http://localhost/api/queryProperties", {
         params: filteredParams
       });
       const { entries, total, offset, limit } = response.data;

@@ -60,7 +60,7 @@ function ProfilePage() {
         async function getUserInterests(userId) {
             try {
                 //let response = await axiosInstance.get(`/fetchInterestsByUser`, { params: { userId: username /*accessToken: accessToken*/ } });
-                const response = await axios.get(`http://localhost:8004/fetchInterestsByUser?userId=${encodeURIComponent(userId)}`);
+                const response = await axios.get(`http://localhost/api/fetchInterestsByUser?userId=${encodeURIComponent(userId)}`);
                 const interestIds = response.data.map(interest => interest.propertyId);
                 setUserInterests(interestIds);
             } catch (error) {

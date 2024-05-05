@@ -17,7 +17,7 @@ function SimpleProductList({ propertyIds }) {
             setLoading(true);
             try {
                 const propertyDetails = await Promise.all(propertyIds.map(id =>
-                    axios.get(`http://localhost:8004/properties/${id}`).then(res => res.data)
+                    axios.get(`http://localhost/api/properties/${id}`).then(res => res.data)
                 ));
                 setProperties(propertyDetails);
                 setError('');  // Clear any previous errors if fetch is successful

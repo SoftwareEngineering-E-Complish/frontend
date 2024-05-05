@@ -78,7 +78,7 @@ function FilterMenuLeft() {
     }, {});
 
     try {
-      const response = await axiosInstance.get("http://localhost:8004/queryProperties", { params: filteredParams });
+      const response = await axiosInstance.get("http://localhost/api/queryProperties", { params: filteredParams });
       const { entries, total, offset, limit } = response.data;
       setSearchResults(entries);
       setQueryInfo({ total, offset, limit });

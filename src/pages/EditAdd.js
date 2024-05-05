@@ -198,7 +198,7 @@ function EditAdd() {
   const fetchInterestedUsers = async (propertyId) => {
     try {
       //let response = await axiosInstance.get(`/fetchInterestsByUser`, { params: { userId: username /*accessToken: accessToken*/ } });
-      const response = await axios.get(`http://localhost:8004/fetchInterestsByProperty?propertyId=${encodeURIComponent(propertyId)}`);
+      const response = await axios.get(`http://localhost/api/fetchInterestsByProperty?propertyId=${encodeURIComponent(propertyId)}`);
       const interestUsers = response.data.map(interest => interest.propertyId);
       setUsersInterested(interestUsers);
   } catch (error) {
