@@ -229,16 +229,22 @@ function ProductDetail() {
                   {Array.from({ length: 5 }, (_, i) => {
                     return (
                       <Ratings.Widget
-                        key={i}
-                        widgetDimension="20px"
-                        svgIconViewBox="0 0 19 20"
-                        svgIconPath={iconPath}
-                        widgetHoverColor="rgb(253, 204, 13)"
+                      key={i}
+                      widgetDimension="20px"
+                      svgIconViewBox="0 0 19 20"
+                      svgIconPath={iconPath}
+                      widgetHoverColor="rgb(253, 204, 13)"
                       />
                     );
                   })}
                 </Ratings>
               </dd>
+
+              <dt className="col-sm-4">Property views</dt>
+              <dd className="col-sm-8 mb-3">{property.views}</dd>
+
+              <dt className="col-sm-4">Search appearance</dt>
+              <dd className="col-sm-8 mb-3">{property.views}</dd>
             </dl>
 
             <h4 className="mb-0">Description</h4>
