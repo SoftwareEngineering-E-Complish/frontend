@@ -19,6 +19,7 @@ function ProductDetail() {
   let { id } = useParams();
   const { searchResults, allProperties, setAllProperties } = useSearch();
   const [property, setProperty] = useState(null);
+  const [propertyInterest, setpropertyInterest] = useState(0);
 
   const [isInterested, setIsInterested] = useState(false);
   const [interestButtonText, setInterestButtonText] = useState("Declare Interest");
@@ -52,11 +53,15 @@ function ProductDetail() {
         const response = await axios.get(`http://localhost:8004/properties/${id}`);
         prop = response.data;
       }
+      if (!prop.owner) {
+        prop.owner = "Private";
+      }
       setProperty(prop);
     }
     fetchProperty();
 
     console.log(property);
+    handlePropertyInterest();
 
   }, [id]);
 
@@ -112,6 +117,32 @@ function ProductDetail() {
         console.error('Error removing interest:', error);
       }
     }
+  };
+
+  const handlePropertyInterest = async () => {
+    if (!localStorage.getItem('accessToken')) {
+      const response = await axiosInstance.get("/loginURL");
+      window.location.replace(response.data);
+    }
+    try {
+      const res = await axios.get(`http://localhost:8004/fetchInterestsByProperty?propertyId=${encodeURIComponent(id)}`);
+      console.log(res);
+
+      const oneWeekAgo = new Date();
+      oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+
+      const count = res.data.reduce((count, obj) => {
+        const timestamp = new Date(obj.timestamp);
+        if (timestamp > oneWeekAgo) {
+          count++;
+        }
+        return count;
+      }, 0);
+      setpropertyInterest(count);
+    } catch (error) {
+      console.error('Error while fetching interest:', error);
+    }
+
   };
 
   if (!property) return <div className="spinner text-center">Loading...</div>;
@@ -201,7 +232,7 @@ function ProductDetail() {
               <dd className="col-sm-8 mb-3">{property.property_type}</dd>
 
               <dt className="col-sm-4">Owner</dt>
-              <dd className="col-sm-8 mb-3">owner name</dd>
+              <dd className="col-sm-8 mb-3">{property.owner}</dd>
 
               <dt className="col-sm-4">Constructed in</dt>
               <dd className="col-sm-8 mb-3">{property.year_built}</dd>
@@ -216,9 +247,9 @@ function ProductDetail() {
               <dd className="col-sm-8 mb-3">{property.bathrooms}</dd>
 
               <dt className="col-sm-4">Surface</dt>
-              <dd className="col-sm-8 mb-3">{property.square_meters}</dd>
+              <dd className="col-sm-8 mb-3">{property.square_meters} m<sup>2</sup></dd>
 
-              <dt className="col-sm-4">Seller Rating</dt>
+              <dt className="col-sm-4">Seller rating</dt>
               <dd className="col-sm-8 mb-3">
                 <Ratings
                   rating={4.5}
@@ -229,16 +260,25 @@ function ProductDetail() {
                   {Array.from({ length: 5 }, (_, i) => {
                     return (
                       <Ratings.Widget
-                        key={i}
-                        widgetDimension="20px"
-                        svgIconViewBox="0 0 19 20"
-                        svgIconPath={iconPath}
-                        widgetHoverColor="rgb(253, 204, 13)"
+                      key={i}
+                      widgetDimension="20px"
+                      svgIconViewBox="0 0 19 20"
+                      svgIconPath={iconPath}
+                      widgetHoverColor="rgb(253, 204, 13)"
                       />
                     );
                   })}
                 </Ratings>
               </dd>
+
+              <dt className="col-sm-4">Property views</dt>
+              <dd className="col-sm-8 mb-3">{property.views}</dd>
+
+              <dt className="col-sm-4">Search appearance</dt>
+              <dd className="col-sm-8 mb-3">{property.views}</dd>
+
+              <dt className="col-sm-4">People interested in the last week</dt>
+              <dd className="col-sm-8 mb-3">{propertyInterest}</dd>
             </dl>
 
             <h4 className="mb-0">Description</h4>
