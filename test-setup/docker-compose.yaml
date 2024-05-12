@@ -1,0 +1,86 @@
+version: '3'
+services:
+
+  ################# LLM SERVICE #################
+  llm_service:
+    build: https://github.com/SoftwareEngineering-E-Complish/llm_service.git#Develop
+    # build: ../llm_service/.
+    container_name: llm-service
+    ports:
+      - "8001:8888"
+    environment:
+      - TEST_MODE=constant_response
+
+
+  ################# INVENTORY SERVICE #################
+  inventory-service:
+    build: https://github.com/SoftwareEngineering-E-Complish/inventory.git#develop
+    # build: ../inventory/.
+    container_name: inventory-service
+    command: ["./start.sh"]
+    ports:
+      - 8002:80
+    depends_on:
+      - postgres-db
+    environment:
+      DATABASE_URL: ${DATABASE_URL}
+
+  #################  SERVICE MANAGER #################
+  service-manager:
+    build: https://github.com/SoftwareEngineering-E-Complish/service-manager.git#develop
+    # build: ../service-manager/.
+    container_name: service-manager
+    ports:
+      - 8004:8000
+    environment:
+      GEOLOCATION_API_ACCESS_KEY: ${GEOLOCATION_API_ACCESS_KEY}
+
+
+  #################  POSTGRES DB #################
+  postgres-db:
+    container_name: postgres-db
+    image: "postgis/postgis:16-3.4"
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: postgres
+
+  
+  ################# USER SERVICE #################
+  user_service:
+    build: https://github.com/SoftwareEngineering-E-Complish/user_service.git#develop
+    # build: ../user_service/.
+    container_name: user-manager
+    ports:
+      - "8005:8080"
+    environment:
+      - USER_SERVICE_AWS_ACCESS_KEY_ID=${USER_SERVICE_AWS_ACCESS_KEY_ID}
+      - USER_SERVICE_AWS_SECRET_ACCESS_KEY=${USER_SERVICE_AWS_SECRET_ACCESS_KEY}
+      - USER_SERVICE_AWS_REGION=${USER_SERVICE_AWS_REGION}
+      - COGNITO_CLIENT_ID=${COGNITO_CLIENT_ID}
+      - COGNITO_USER_POOL_ID=${COGNITO_USER_POOL_ID}
+      - COGNITO_HOSTED_UI_BASE_URL=${COGNITO_HOSTED_UI_BASE_URL}
+
+
+  ################# FRONTEND #################
+  frontend:
+    build:
+      context: https://github.com/SoftwareEngineering-E-Complish/frontend.git#feature/tests
+      args:
+        REACT_APP_GOOGLE_MAPS_API_KEY: ${REACT_APP_GOOGLE_MAPS_API_KEY}
+    container_name: frontend
+    ports:
+      - "8000:80"
+
+  ################# IMAGE SERVICE #################
+  image-service:
+    build: https://github.com/SoftwareEngineering-E-Complish/property_images.git#main
+    # build: ../property_images/.
+    container_name: image-service
+    environment:
+      - AWS_ACCESS_KEY_ID=${IMG_AWS_ACCESS_KEY_ID}
+      - AWS_SECRET_ACCESS_KEY=${IMG_AWS_SECRET_ACCESS_KEY}
+    ports:
+      - 8006:8080
+
+

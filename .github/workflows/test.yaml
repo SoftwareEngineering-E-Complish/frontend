@@ -1,31 +1,16 @@
-name: Build
+name: "Integration tests"
 on:
   push:
     branches:
-      - main
-      - develop
-  pull_request:
-    types: [opened, synchronize, reopened]
-jobs:
-  sonarcloud:
-    name: SonarCloud
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-        with:
-          fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
-      - name: SonarCloud Scan
-        uses: SonarSource/sonarcloud-github-action@master
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Needed to get PR information, if any
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+      - feature/tests
 
-  e2e-tests:
-    name: "End-to-end Testing"
+jobs:
+  tests:
+    name: "Integration testing"
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - name: "Set up environment"
+      - name: "Set up environment and wait for docker to finish building"
         run: docker compose -f ./test-setup/docker-compose.yaml up -d --wait
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
@@ -46,7 +31,7 @@ jobs:
           REACT_APP_GOOGLE_MAPS_API_KEY: ${{ secrets.REACT_APP_GOOGLE_MAPS_API_KEY }}
           
           GEOLOCATION_API_ACCESS_KEY: ${{ secrets.GEOLOCATION_API_ACCESS_KEY }}
-      - name: "Testing"
+      - name: "End to end tests"
         uses: cypress-io/github-action@v6
         with:
           wait-on: "http://localhost:8000"
